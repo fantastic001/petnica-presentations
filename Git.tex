@@ -33,14 +33,31 @@
 }
 
 \frame{
+	\frametitle{Git}
+	\begin{itemize}
+		\item open source 
+		\item Razvijen od strane Linus Torvaldsa - kreatora Linuksa 
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Inicijalna konfiguracija}
+	\begin{itemize}
+		\item git config --global user.email <email>
+		\item git config --global user.name <ime i prezime>
+	\end{itemize}
+}
+
+\frame{
 	\frametitle{Osnovne operacije u repozitorijumu}
 	\begin{itemize}
 		\item Inicijalizacija repozitorijuma 
-		\item Kloniranje postojećeg repozitorijuma 
 		\item Dodavanja fajlova u repozitorijum 
-		\item commit 
+		\item git commit 
+		\item git commit --amend - dodavanje na postojeći komit
 		\item Pregled izmena, log i diff 
-		\item push/pull 
+		\item git reset --hard 
+		\item git reset --hard HEAD~1 - brisanje komita
 	\end{itemize}
 }
 
@@ -77,6 +94,19 @@
 		\item hotfix -> release-x.y 
 		\item release-x.y -> dev, dev -> master 
 		\item Dodati tag sa git tag x.y da se označi nova verzija 
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Kloniranje, ažuriranje i slanje izmena na server}
+	\begin{itemize}
+		\item git clone - kloniranje postojećeg repozitorijuma sa servera
+		\item git pull - update lokalnog repozitorijuma
+		\item git push - slanje izmena na repozitorijum
+		\item git push <remote> <branch> - slanje izmena na zadati server na zadatu granu na datom serveru
+		\item git remote -v - listanje svih povezanih servera
+		\item git remote add <name> <adresa> - dodavanja remote servera
+		\item Servisi za deljenje koda: GitHub, GitLab, BitBucket, ...
 	\end{itemize}
 }
 
