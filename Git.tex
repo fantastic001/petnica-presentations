@@ -1,0 +1,83 @@
+\documentclass{beamer} 
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{multicol}
+
+\usetheme{Berlin}
+\begin{document}
+
+\title{Git - sistem za kontrolu verzija}
+\author{Stefan Nožinić (stefan@lugons.org)}
+
+\frame{
+\titlepage
+}
+
+\frame{
+	\frametitle{Uvod}
+	\begin{itemize} 
+		\item Šta je sistem za kontrolu verzija?
+		\item Problemi prilikom razvoja softvera
+		\item Repozitorijum - mesto za skladištenje koda
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Vrste sistema za kontrolu verzija}
+	\begin{itemize} 
+		\item Centralizovani - SVN 
+		\item Distribuirani - Git
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Osnovne operacije u repozitorijumu}
+	\begin{itemize}
+		\item Inicijalizacija repozitorijuma 
+		\item Kloniranje postojećeg repozitorijuma 
+		\item Dodavanja fajlova u repozitorijum 
+		\item commit 
+		\item Pregled izmena, log i diff 
+		\item push/pull 
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Grananje}
+	\begin{itemize}
+		\item Upotrebljava se kada je potrebno razvijati novu stavku u softveru 
+		\item Može da služi kao i metod da se više stavki razvija paralelno bez toga da zavise jedna od druge 
+		\item korisno za testiranje različitih metoda za istu namenu 
+		\item Korisno za uklanjanje grešaka
+	\end{itemize}
+}
+
+
+\frame{
+	\frametitle{Rad sa granama}
+	\begin{itemize}
+		\item git checkout -b nova-grana
+		\item git checkout postojeca-grana
+		\item git branch -d nova-grana 
+		\item git merge grana 
+	\end{itemize}
+}
+
+\frame{
+	\frametitle{Dobre prakse}
+	\begin{itemize}
+		\item Imati dev granu za netestiranu verziju dok master ostaviti za stabilnu verziju
+		\item Svaka nova komponenta u softveru se razvija u posebnoj feature grani za tu komponentu
+		\item Kada se razvoje komponente završi, radi se merge u dev granu 
+		\item Kada je nova verzija spremna, pravi se release-x.y grana 
+		\item dev -> release-x.y
+		\item Ako se pronađe bug dok je razvoj spreman za objavu (release grana), pravi se hotfix grana i u njoj se ispravljaju greške 
+		\item hotfix -> release-x.y 
+		\item release-x.y -> dev, dev -> master 
+		\item Dodati tag sa git tag x.y da se označi nova verzija 
+	\end{itemize}
+}
+
+\end{document}
