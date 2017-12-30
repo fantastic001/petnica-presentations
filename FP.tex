@@ -1,0 +1,107 @@
+\documentclass{beamer} 
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{listings}
+
+
+\begin{document}
+
+\title{Uvod u funkcionalno programiranje}
+\author{Stefan Nožinić (stefan@lugons.org)}
+
+\frame{
+\titlepage
+}
+
+\frame{
+\frametitle{Uvod}
+\begin{itemize}
+\item LISP 1950te
+\item Deklarativni stil 
+\item Imutabilnost 
+\item Thread-safeness 
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Primer promene stanja u C}
+\begin{lstlisting}
+#include <stdio.h>
+
+int f( int* x ) 
+{
+	int res = (*x) + 1;
+	(*x)++;
+	return res;
+}
+
+int main() {
+	int x = 5;
+	printf("%d\n", f(&x));
+	printf("%d\n", f(&x));
+	return 0;
+}
+\end{lstlisting}
+\end{frame}
+
+\frme{
+\begin{itemize}
+\item Funkcija f povećava x za jedan i vraća x+1
+\item f menja stanje od x
+\item Ako ne vidimo definiciju funkcije f, ne znamo šta ona zapravo radi sa vrednostima ulaznih parametara!
+\item Da li uvek možemo da tvrdimo da je f(x) == f(x)?
+\end{itemize}
+}
+
+\frame{
+\frametitle{Prednosti nemenjanja stanja promenljivih}
+
+\begin{itemize}
+\item Kompajler će ispisati grešku kada pokušamo promeniti stanje
+\item Svaka funkcija za iste ulazne parametre vraća istu povratnu vrednost
+\item Moguće lako paralelizovati program jer nema promene stanja promenljive 
+\end{itemize}
+}
+
+\frametitle{Funkcija koja vraća jedinicu ako je bar jedan ulaz jednak nuli}
+\begin{lstlisting}
+anyzero :: Int -> Int -> Int
+anyzero 0 x = 1
+anyzero x 0 = 1
+anyzero x y = 0
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Neke funkcije koje rade sa listama}
+\begin{lstlisting}
+
+mymap :: (a -> b) -> [a] -> [b]
+mymap _ [] = []
+mymap f (x:xs) = (f x) : (mymap f xs)
+
+
+reduce :: (b -> a -> b) -> b -> [a] -> b 
+reduce _ z [] = z 
+reduce f z (x:xs) = reduce f (f z x) xs
+
+myfilter :: (a -> Bool) -> [a] -> [a]
+myfilter _ [] = [] 
+myfilter f (x:xs) = if (f x) then x : (myfilter f xs) 
+	else myfilter f xs
+
+*Main> mymap (+ 1) [1,2,3]
+[2,3,4]
+*Main> filter (\x -> x `mod` 2 == 0) [1,2,3,4,5,6]
+[2,4,6]
+*Main> reduce (+) 0 [1,2,3,4,5]
+15
+*Main> 
+
+\end{lstlisting}
+\end{frame}
+
+\end{document}
