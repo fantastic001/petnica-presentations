@@ -65,6 +65,221 @@ int main() {
 \end{itemize}
 }
 
+\frame{
+\frametitle{Data in - data out model} 
+\begin{itemize}
+\item Primenjivo nezavisno od jezika
+\item Svaka funkcija vraća neku vrednost 
+\item Za isti ulaz, funkcija uvek vraća isti izlaz
+\item Funkcija ne zavisi od globalnog okruženja (globalne promenljive, IO, ...)
+\item Funkcija ne modifikuje sopstveni ulaz 
+\item Moguće primeniti i u OOP kodu - svaki setter vraća novi objekat 
+\item Primer: lista
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Lista u C}
+\begin{lstlisting}
+typedef struct ListElem_t
+{
+        int value;
+        struct ListElem_t* next;
+} ListElem;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Konstruktor elementa liste}
+\begin{lstlisting}
+
+ListElem* create_element(int value, ListElem* next)
+{
+        ListElem* elem = (ListElem*) malloc(sizeof(ListElem));
+        elem->value = value;
+        elem->next = next;
+        return elem;
+}
+
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Lista struktura}
+\begin{lstlisting}
+
+typedef struct
+{
+        ListElem* head;
+} List;
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Konstruktor liste}
+\begin{lstlisting}
+List* create_list(ListElem* head)
+{
+        List* l = (List*) malloc(sizeof(List));
+        l->head = head;
+        return l;
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Dodavanje elementa u listu}
+\begin{lstlisting}
+List* push(List* l, int value)
+{
+        return create_list(create_element(
+		value, l->head
+	));
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Rep liste}
+\begin{lstlisting}
+List* tail(List* l)
+{
+        return create_list(l->head->next);
+}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{print funkcija za ispis liste - zbog debug-a}
+\begin{lstlisting}
+void print(List* l)
+{
+        if (l->head == NULL) printf("\n");
+        else
+        {
+                printf("%d ", l->head->value);
+                print(tail(l));
+        }
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{main}
+\begin{lstlisting}
+int main() {
+        List *l = create_list(NULL);
+        push(l, 5);
+        print(l);
+        List* l2 = push(l, 5);
+        print(l2);
+
+        print(tail(l2));
+        print(push(l2, 10));
+        return 0;
+}
+\end{lstlisting}
+\end{frame}
+
+\frame{
+\begin{itemize}
+\item Pure functional 
+\item Funkcije ne modifikuju parametre 
+\item Funkcije UVEK vraćaju rezultat
+\item Funkcija može primiti funkciju kao parametar
+\item Funkcija može vratiti funkciju kao rezultat
+\item Kompajlira se ali se može i interpretirati interaktivno
+\item ghc i ghci
+\item ".hs" ekstenzija se obično koristi za fajlove sa kodom
+\item Strogo tipovan - svaka vrednost mora imati svoj tip i jasno se zna šta je kog tipa tokom kompajliranja
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Primer funkcije koja računa kvadrat izlaza}
+\begin{lstlisting}
+sq :: Int -> Int
+sq x = x*x
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Primer upotrebe alata ghci}
+\begin{lstlisting}
+ghci example.hs 
+>>> sq 5 
+25
+>>>
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Primer funkcije koja računa zbir ulaznih parametara}
+\begin{lstlisting}
+add :: Int -> Int -> Int 
+add a b = a+b
+\end{lstlisting}
+\end{frame}
+
+\frame{
+\begin{itemize}
+\item Funkcija u Haskell-u prima samo jedan parametar
+\item Funkcija `add` je funkcija koja prima jedan parametar i koja vraća funkciju koja prima drugi parametar i vraća zbir ta dva parametra
+\item inc = add 1 je funkcija koja vraća ulaz uvećan za jedan
+\end{itemize}
+}
+
+\frame{
+\begin{itemize}
+\item Jednostruko-povezane liste
+\item l = [1,2,3]
+\item head l 
+\item tail l 
+\item reverse l 
+\item last l 
+\item l = l1 ++ l2
+\item 5 : l
+\item range = [1..5]
+\item range = [1, 1.01..5]
+\end{itemize}
+}
+
+
+\begin{frame}[fragile]
+\begin{lstlisting}
+squares = [x*x | x <- [1..10]]
+
+squaresDiv3 = [x*x | x <- [1..10], x*x `mod` 3 == 0]
+
+unitcircle = [(x,y) | x <- [0, 0.01..10], y <- [0,0.01..10], x*x + y*y < 1]
+\end{lstlisting}
+\end{frame}
+
+\frame{
+\frametitle{Pattern matching}
+\begin{itemize}
+\item Fukciju je moguće definisati specifično za neke ulazne parametre
+\item Neka vrsta zamene za "if" tako da kod izgleda lepo
+\item Može se koristiti za "otpakivanje" podataka u složenim tipovima kao što je lista
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Faktorijel - primer pattern matching-a} 
+\begin{lstlisting}
+fact :: Int -> Int
+fact 0 = 1
+fact n = n * (fact (n-1))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
 \frametitle{Funkcija koja vraća jedinicu ako je bar jedan ulaz jednak nuli}
 \begin{lstlisting}
 anyzero :: Int -> Int -> Int
@@ -103,5 +318,7 @@ myfilter f (x:xs) = if (f x) then x : (myfilter f xs)
 
 \end{lstlisting}
 \end{frame}
+
+
 
 \end{document}
