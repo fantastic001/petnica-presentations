@@ -319,6 +319,159 @@ myfilter f (x:xs) = if (f x) then x : (myfilter f xs)
 \end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Funkcija koja vraća listu gde dva ista elementa nisu jedan do drugog} 
+\begin{lstlisting}
+
+norepeat :: (Eq a) => [a] -> [a]
+norepeat [] = [] 
+norepeat (x:[]) = [x]
+norepeat (x:y:xs) = if x == y then norepeat (x:xs) else x:(norepeat (y:xs))
+
+*Main> norepeat [1,1,2,5,5,6]
+[1,2,5,6]
+*Main> norepeat [1,1,2,5,5,6, 6]
+[1,2,5,6]
+*Main> norepeat [1,2,5,5,6, 6]
+[1,2,5,6]
+*Main> norepeat [1,2,5]
+[1,2,5]
+*Main>
+
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Quick sort}
+\begin{lstlisting}
+qsort :: [Int] -> [Int]
+qsort [] = []
+qsort l = (qsort [x | x<-l, x < y]) ++ [y] ++ (qsort [x | x<-l, x>y]) where y = (head l)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Razdvajanje stringa u listu reči}
+\begin{lstlisting}
+findFirstWord :: [Char] -> ([Char], [Char])
+findFirstWord "" = ("", "")
+findFirstWord " " = ("", "")
+findFirstWord s =
+    let (remaining, others) = findFirstWord $ tail s
+        x = head s
+    in if x == ' ' then ("", tail s) else (x : remaining, others)
+
+split :: [Char] -> [[Char]]
+split "" = []
+split s = let (x, y) = findFirstWord s
+          in [x] ++ (split y)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Funkcija koja vraća dužinu stringa}
+\begin{lstlisting}
+strlen :: String -> Int
+strlen s
+    | s == "" = 0
+        | otherwise = 1 + (strlen $ tail s)
+\end{lstlisting}
+\end{frame}
+
+
+\frame{
+\frametitle{Tipovi podataka}
+\begin{itemize}
+\item Definišu se tako što se navede ime tipa i njegovi konstruktori
+\item data NoviTip = konstruktor1 | konstruktor2 | ... 
+\item data Shape = Rectangle Int Int | Circle Int | Square Int 
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Primer funkcije nad tipom}
+\begin{lstlisting}
+data Shape = Circle Float | Rectangle Float Float 
+area :: Shape -> Float 
+area (Circle r) = r*r*3.14
+area (Rectangle a b) = a*b
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Primer - Zipper}
+\begin{lstlisting}
+data Zipper a = Zip [a] a [a] deriving (Show)
+
+right :: Zipper a -> Zipper a
+right (Zip l focus []) = Zip l focus [] 
+right (Zip l focus r) = Zip (focus:l) (head r ) (tail r)
+
+
+left :: Zipper a -> Zipper a
+left (Zip [] focus r) = Zip [] focus r
+left (Zip l focus r) = Zip (tail l) (head l) (focus:r)
+
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\begin{lstlisting}
+*Main> z = Zip [3, 2, 1] 4 [5, 6, 7]
+*Main> right z 
+Zip [4,3,2,1] 5 [6,7]
+*Main> left $ right z 
+Zip [3,2,1] 4 [5,6,7]
+*Main> left $ left $ right z 
+Zip [2,1] 3 [4,5,6,7]
+*Main> left $ left $ left $ right z 
+Zip [1] 2 [3,4,5,6,7]
+*Main> left $ left $ left $ left $ right z 
+Zip [] 1 [2,3,4,5,6,7]
+*Main> left $ left $ left $ left $ left $ right z 
+Zip [] 1 [2,3,4,5,6,7]
+*Main> 
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Binarno stablo}
+\begin{lstlisting}
+data TreeNode = Node {
+        left :: Node,
+        right :: Node,
+        value :: Int
+    } | EmptyNode
+
+tolist :: TreeNode -> [Int]
+tolist EmptyNode = []
+tolist n = let l = tolist $ left n
+               r = tolist $ right n
+               v = value n
+           in l ++ [v] ++ r
+
+append :: TreeNode -> Int -> Node
+append EmptyNode x = Node EmptyNode EmptyNode x
+append n x = let v = value n
+                 r = right n
+                 l = left n
+             in if x < v then Node (append l x) r v else Node l (append r x) v
+
+
+fromlist :: [Int] -> TreeNode -> TreeNode
+fromlist [] n = n
+fromlist l n = let x = head l
+               in fromlist (tail l) (append n x)
+
+bstsort :: [Int] -> [Int]
+bstsort l = tolist (fromlist l EmptyNode)
+\end{lstlisting}
+\end{frame}
+
 
 
 \end{document}
