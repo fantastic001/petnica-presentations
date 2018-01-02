@@ -474,4 +474,292 @@ bstsort l = tolist (fromlist l EmptyNode)
 
 
 
+\frame{
+\frametitle{Monade}
+\begin{itemize}
+\item Način da se promeni stanje 
+\item U realnom svetu, pojavljuje se potreba za moguč=ćnošću da se stanje može promeniti
+\item Primer: IO
+\item Monada uokviruje postojeći tip sa dodatnim informacijama koje se provlače kroz izračunavanje. 
+\item Potrebno implementirati:
+\begin{itemize}
+\item Tip podataka 
+\item return funkciju - a - > m a 
+\item bind funkciju - m a -> (a -> m a) -> m a
+\end{itemize}
+\item return ne utiče na izračunavanje 
+\item bind vezuje dva izračunavanja - poput kompozicije
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Primer * funkcije sa celim brojevima koje loguju operacije}
+\begin{lstlisting}
+data Debuggable = Debuggable (Int, [[Char]]) deriving (Show)
+
+
+ret :: Int -> Debuggable 
+ret x = Debuggable (x, [])
+
+bind :: Debuggable -> (Int -> Debuggable) -> Debuggable
+bind (Debuggable a b) f = Debuggable (y, z ++ b) where Debuggable (y,z) = f(a)
+
+inc :: Int -> Debuggable  
+inc x = Debuggable (x+1, ["Number increased by one"])
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{lstlisting}
+*Main> ret 5 
+Debuggable (5,[])
+*Main> inc 5 
+Debuggable (6,["Number increased by one"])
+*Main> bind (ret 5) inc 
+Debuggable (6,["Number increased by one"])
+*Main> bind (bind (ret 5) inc) inc
+Debuggable (7,["Number increased by one","Number increased by one"])
+*Main> 
+\end{lstlisting}
+\end{frame}
+
+
+\frame{
+\begin{itemize}
+\item Haskell ima sintaksni šećer za monade 
+\item pomoću do-bloka je moguće pisati kod koji liči na kod u imperativnim jezicima 
+\item Potrebno implementirati monade tako da ih Haskell prepozna kao takve 
+\end{itemize}
+}
+
+\begin{frame}[fragile]
+\frametitle{Implementacija monade tako da možemo koristiti Haskellov sintaksni šećer}
+\begin{lstlisting}
+import Control.Applicative -- Otherwise you can't do the Applicative instance.
+import Control.Monad (liftM, ap)
+
+data Debuggable a = Debuggable (a, [[Char]]) deriving (Show)
+-- needed since newer versions of GHC
+instance Functor Debuggable where
+  fmap = liftM
+
+instance Applicative Debuggable where
+  pure  = return
+  (<*>) = ap
+------------------------
+
+instance Monad Debuggable where 
+  return x = Debuggable (x, [])
+  (>>=) (Debuggable (a,b)) f = Debuggable (y, z ++ b) where Debuggable (y,z) = f(a)
+
+inc :: Int -> Debuggable Int
+inc x = Debuggable (x+1, ["Number increased by one"])
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Primer upotrebe return i bind funkcija}
+\begin{lstlisting}
+*Main> (inc 5) >>= (\x -> (return x) >>= inc)
+Debuggable (7,["Number increased by one","Number increased by one"])
+*Main>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{do-blokovi}
+\begin{lstlisting}
+inc2 :: Int -> Debuggable Int 
+inc2 num = do 
+  x <- inc num
+  y <- inc x 
+  return y 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Unit monada}
+\begin{lstlisting}
+import Control.Applicative -- Otherwise you can't do the Applicative instance.
+import Control.Monad (liftM, ap)
+
+data Unit a = Unit a deriving (Show)
+
+instance Functor Unit where
+  fmap = liftM
+
+instance Applicative Unit where
+  pure  = return
+  (<*>) = ap
+
+instance Monad Unit where 
+  return x = Unit x
+  (>>=) (Unit x) f = f x
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Maybe monada}
+\begin{lstlisting}
+import Control.Applicative -- Otherwise you can't do the Applicative instance.
+import Control.Monad (liftM, ap)
+
+data Maybe a = Just a | Nothing
+
+instance Functor Maybe where
+  fmap = liftM
+
+instance Applicative Maybe where
+  pure  = return
+  (<*>) = ap
+
+instance Monad Maybe where 
+  return x = Just x
+  (>>=) (Nothing) _ = Nothing
+  (>>=) (Just x) f = f x
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{IO monada - hello world}
+\begin{lstlisting}
+main :: IO ()
+main = putStrLn "Hello world!" 
+
+ghc hello.hs -o hello -dynamic 
+
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Unos podataka preko stadardnog ulaza}
+\begin{lstlisting}
+main :: IO ()
+main = do
+  putStrLn "Enter your name"
+  name <- getLine
+  putStrLn $ "Your name is " ++ name
+\end{lstlisting}
+\end{frame}
+
+\frame{
+\frametitle{WTF?????}
+\begin{itemize}
+\item IO monada je hak 
+\item IO moada je izlaz u realni svet 
+\item IO monada čuva redni broj tako da funkcije se ne optimizuju od strane kompajlera već se uvek izvršavaju!
+\end{itemize}
+}
+
+
+\begin{frame}[fragile]
+\frametitle{Naš printStrLn} 
+\begin{lstlisting}
+
+{-# LANGUAGE ForeignFunctionInterface #-}
+
+import Foreign.C.String
+import Foreign.C.Types 
+
+foreign import ccall safe "prototypes.h my_print_line"
+    cMyPrintLine :: CString -> IO ()
+
+myPrintLine :: String -> IO () 
+myPrintLine str = do 
+    c_str <- newCString str
+    cMyPrintLine c_str
+
+
+
+main = do 
+    myPrintLine "hello!"
+
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{C kod}
+\begin{lstlisting}
+
+#include <stdio.h>
+#include "functions.h"
+
+
+void my_print_line(char* str) 
+{
+	printf("%s\n", str);
+}
+
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{header}
+\begin{lstlisting}
+extern int my_rand();
+extern void my_print_line(char*);
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Implementacija rand funkcije}
+\begin{lstlisting}
+
+#include <stdlib.h>
+#include <time.h>
+
+int my_rand() 
+{
+	time_t t; 
+	srand((unsigned) time(&t));
+	return 1 + rand() % 5;
+}
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{lstlisting}
+foreign import ccall safe "prototypes.h my_rand"
+    cMyRand :: IO CInt
+
+myRand :: IO Int
+myRand = do
+    r <- cMyRand
+    return ((fromInteger . toInteger) r)
+
+
+guessToStr :: Int -> String
+guessToStr 1 = "1"
+guessToStr 2 = "2"
+guessToStr 3 = "3"
+guessToStr 4 = "4"
+guessToStr 5 = "5"
+guessToStr 6 = "6"
+
+
+main = do
+    myPrintLine "hello!"
+    myPrintLine "hello!"
+    r1 <- myRand
+    r2 <- myRand
+    myPrintLine $ guessToStr r1
+    myPrintLine $ guessToStr r2
+
+\end{lstlisting}
+\end{frame}
+
+\frame{
+\frametitle{Zadaci}
+\begin{itemize}
+\item JSON parser 
+\item Parsiranje izraza (5+2, (3+2)*5, 5*2 - 1, ...)
+\item Web server sa REST API-em koji komunicira sa bazom
+\end{itemize}
+}
 \end{document}
