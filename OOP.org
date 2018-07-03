@@ -109,7 +109,7 @@ Stefan Nožinić <stefan@lugons.org>
 ** Apstraktni tip podataka 
 
 + opisan vrednostima i operacijama
-'+ nije opisan atributima 
++ nije opisan atributima 
 
 
 ** Privatne metode 
@@ -296,12 +296,12 @@ Stefan Nožinić <stefan@lugons.org>
       def read(self, path):
 	  raise NotImplementedError
 
-  def ExcelReader(DocumentReader):
+  class ExcelReader(DocumentReader):
       def read(self, path):
 	  # ...
 	  return result
 
-  def DocReader(DocumentReader):
+  class DocReader(DocumentReader):
       # ...
 
   path = get_input_file_path()
@@ -324,14 +324,14 @@ Stefan Nožinić <stefan@lugons.org>
       def verify(self, path):
 	  raise NotImplementedError
 
-  def ExcelReader(DocumentReader):
+  class ExcelReader(DocumentReader):
       def read(self, path):
 	  # ...
 	  return result
       def verify(self, path):
 	  return path.endswith(".xlsx")
 
-  def DocReader(DocumentReader):
+  class DocReader(DocumentReader):
       # ...
 
   path = get_input_file_path()
