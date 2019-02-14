@@ -1,9 +1,7 @@
-<!-- $theme: gaia -->
-
 
 # OOP - objektivno opširno predavanje 
 
-###### Stefan Nožinić <stefan@lugons.org>
+Stefan Nožinić <stefan@lugons.org>
 
 
 ---
@@ -68,7 +66,7 @@
 ```
 
 ---
-# Primer: date koji čuva dan mesec i godinu i ima operaciju povecanja za n dana 
+# Primer: Date koji čuva dan mesec i godinu i ima operaciju povećanja za n dana 
 
 ```python
   class Date:
@@ -82,7 +80,7 @@
 ```
 
 ---
-# Primer: date koji čuva u unix timestamp 
+# Primer: Date koji čuva (skoro) broj sekundi 
 
 ```python
   class Date:
@@ -98,7 +96,8 @@
 ```python
   today = Date(2018, 6, 29)
   today.advance(5)
-  # ne interesuje me kooja je interna struktura od ove dve pomenute 
+  # ne interesuje me kooja je interna 
+  # struktura od ove dve pomenute 
 ```
 
 ---
@@ -124,7 +123,7 @@
 # Apstraktni tip podataka 
 
 * opisan vrednostima i operacijama
-'+ nije opisan atributima 
+* nije opisan atributima 
 
 
 ---
@@ -182,10 +181,8 @@
 
       def get_family(self):
 	  return self.familyy
-```
----
 
-```python
+
   house = House((-22, 50), "Simic")
   print(house.get_location())
   print(house.get_family())
@@ -228,16 +225,19 @@
 	  raise NotImplementedError
       def step(self):
 	  raise NotImplementedError
-```
----
-```python
+
   class Monster(GameObject):
       def draw(self):
 	  # ...
 
       def step(self):
 	  # logika za pomeranje objekta u svakom frejmu
+```
 
+---
+# ... 
+
+```python
   class Player(GameObject):
       def __init__(self, x, y):
 	  super(Player, self).__init__(self, x, y)
@@ -251,20 +251,23 @@
 
       def isDead(self):
 	  return self.is_dead
+
 ```
 ---
+
 ```python
   m1 = Monster(5,5)
   m2 = Monster(100, 100)
   player = Player(0, 0)
   objects = [player, m1, m2]
-  while not player.isDead():
+  while  not player.isDead():
       handle_input()
       for obj in objects:
 	  obj.step()
       for oobj in objects:
 	  obj.draw()
 ```
+
 
 ---
 # Kompozicija 
@@ -314,10 +317,6 @@
 * kod je otvooren za dodavanje ali je zatvoren za modifikaciju
 * ovo znači da treba da dizajniramo softver tako da se on menja dodavanjem novih klasa a da izbegavamo menjanje starih
 * Na primer, napravimo interfejse i onda svaka klasa implementira pojedini interfejs
-
----
-
-# Princim otvorenosti / zatvorenosti
 * Primer: interfejs kooji sadrži funkcije za čuvanje teksta u dokument a svaka klasa implementira čuvanje u specifičan format - dodavanje formata = dodavanje nove klase
 
 
@@ -329,16 +328,13 @@
       def read(self, path):
 	  raise NotImplementedError
 
-  def ExcelReader(DocumentReader):
+  class ExcelReader(DocumentReader):
       def read(self, path):
 	  # ...
 	  return result
-
-  def DocReader(DocumentReader):
+  class DocReader(DocumentReader):
       # ...
-```
----
-```python
+
   path = get_input_file_path()
   excel = ExcelReader()
   content = None
@@ -360,18 +356,18 @@
       def verify(self, path):
 	  raise NotImplementedError
 
-  def ExcelReader(DocumentReader):
+  class ExcelReader(DocumentReader):
       def read(self, path):
 	  # ...
 	  return result
       def verify(self, path):
 	  return path.endswith(".xlsx")
-
-  def DocReader(DocumentReader):
-      # ...
 ```
 ---
 ```python
+  class DocReader(DocumentReader):
+      # ...
+
   path = get_input_file_path()
   readers = [
       DocReader(),
@@ -407,15 +403,17 @@
 	  self.width = w
       def set_height(self, h):
 	  self.height = h
-```
----
-```python
+
   class Square(Rectangle):
       def __init__(self, height):
 	  super(Square, self).__init__(height, height)
-
+```
+---
+```python
   a = Square(5)
   a.set_width(7) # sta cemo sad?!
+
+
 ```
 
 
@@ -425,6 +423,7 @@
 * ako u stvarnom svetu nešto smatramo specijalnim slučajem, to ne znači da i u programu to smatramo specijalnim slučajem klase!
 * u primeru klasa Square gubi invarijantu da je širina jednaka dužini
 * u gornjem primeru bismo uvek morali da proveravamo da li je objekat tipa Rectangle ili tipa Square što gubi smisao nasleđivanja!
+
 
 ---
 # Princip segregacije interfejsa 
@@ -452,18 +451,20 @@
 	  # ...
       def read(self):
 	  # ....
-
-  class DocFormat(Readable):
-      def read(self):
-	  # ...
 ```
 ---
 ```python
+  class DocFormat(Readable):
+      def read(self):
+	  # ...
+
   def save(writable: Writable):
       # koristi klasu koja implementira Writable
 
   def open(readable: Readable):
-      # koristi klasu koja implementira Readable interfejs
+      # koristi klasu koja implementira 
+      # Readable interfejs
+
 ```
 
 
@@ -477,5 +478,5 @@
 # Zadaci 
 
 * Klasa PrimeGenerator koja pri pozivu funkcije get() vraća trenutni prost broj a pri pozivu next() prelazi na sledeći
-* Generisanje HTML-a pomoću objekata kao  npr h1, h2, ..., p, a, ...
-* nadokraditi zadatak 2 da podržava i markdown 
+* Generisanje HTML-a pomoću objekata kao  npr h1, h2, .., p, a, ...
+* nadograditi zadatak 2 da podržava i markdown 
