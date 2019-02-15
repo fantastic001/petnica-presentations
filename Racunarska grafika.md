@@ -1,0 +1,169 @@
+
+# Računarska grafika (i svašta još nešto)
+
+Stefan Nožinić stefan@lugons.org
+
+---
+Agenda 
+============
+
+* Reprezentacija 2D slike u računaru
+* transformacije 2D slike
+* vektorska grafika i rendering 2D slike
+* uvod u 3D grafiku
+* transformacije u 3D grafici
+* arhitektura GPU
+* fizika u video igrama
+
+---
+# Slika i RGB sistem boja 
+
+* sliku preddstavljamo kao 2D matricu gde svaka ćelija sadrži trojku (r,g,b)
+* brojevi u trojci reprezentuju količinu crvene, zelene i plave boje (3 bajta)
+* Razlog za izbor RGB je aditivnost boja (ekran računara radi tako što mea crvenu, zelenu i plavu svetlost da napravi ceo spektrum boja)
+* RYB nije moguće koristiti kada radimo sa svetlošću jer, na primer, ne možemo dobiti zelenu boju (za razliku od mastila)
+
+
+---
+# Drugi sistemi boja 
+
+* RGBA
+* HSV
+* CMYK
+
+---
+# HSV
+
+* $$ V = \frac{R+G+B}{3} $$
+* $$ 1 - \frac{3}{R+G+B}\min(R,G,B) $$
+* $$ H = \cos^{-1}(\frac{2R - B-G}{2\sqrt{(R-G)^2 + (R-B)(G-B)}}) $$ 
+* za G>B
+*  H = 360 - H  za B>G 
+
+
+---
+# Transformacije nad slikom
+
+* kako možemo posmatrati sliku
+* translacija 
+* skaliranje
+* rotacija
+
+---
+# Slika kao signal 
+
+* model
+* interpolacija uvod 
+
+---
+# Translacija 
+
+* svaku tačku pomerimo za (wx, wy)
+
+---
+# Skaliranje 
+
+* računamo vrednost signala između tačaka
+* nearest neighbour interpolacija
+* bilinearna interpolacija 
+
+---
+# Rotacija 
+
+* rotacija oko tačke (0,0)
+$$ x' = \cos{\theta}x - \sin{\theta}y $$
+$$ y' = \sin{\theta}x + \cos{\theta}y $$
+
+* rotacija oko centra?
+
+
+
+---
+# Vektoorska grafika
+
+* ne čuvamo piksele već informacije o oblicima
+* linija
+* luk
+* ostali oblici 
+
+---
+# Crtanje linije na ekranu 
+
+* $$ y = kx + n $$
+* $$ k = \frac{y_2 - y_1}{x_2 - x_1} $$
+* $$ n = y_1 - kx_1 $$
+
+---
+# 3D grafika 
+
+* verteksi (x,y,z)
+* objekti se reprezentuju trouglovima
+* svaki trougao čine 3 verteksa
+
+---
+# Algebarska definicija vektora
+
+* predstava vektora
+* apsolutna vrednost vektora
+* skalarni proizvod algebarski i geometrijski 
+* vektor kroz dve tačke
+* radius vektor
+* ortogonalni vektori (normalni)
+* vektorski proizvod 
+* jedinični vektor
+
+---
+# Matrice
+
+* sistemi linearnih jednačina  i matrična reprezentacija
+* determinante 
+* množenje matrice vektorom
+* množenje matrica 
+* jedinična matrica
+* inverzna matrica 
+
+
+---
+# Rang matrice
+
+* definicija ranga preko sistema linearnih jednačina 
+
+---
+# Vektorski prostori 
+
+* linearna kombinacija vektora
+* linearna (ne)zavinost
+* definicija vektorskog prostora 
+* baza vektorskog prostora 
+* kolona prostor 
+
+---
+# Vektorska notacija 
+
+* verteks možemo predstaviti kao vektor (x,y,z)
+* sve linearne transformacije (rotacija i skaliranje) možemo predstaviti u matričnom obliku
+
+---
+# Matrični oblici transformacija 
+
+* rotacija
+* skaliranje
+* translacija 
+* $$ x' = TRSx $$ 
+
+---
+# Različiti pogledi na objekat 
+
+* model space
+* camera space
+* perspektivna projekcija 
+
+
+---
+# Fizika u video igrama
+
+* kretanje 
+* sile 
+* numeričke metode
+* detekcija sudara 
+* obrada sudara
