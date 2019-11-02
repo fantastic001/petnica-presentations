@@ -1,8 +1,11 @@
 
 
-* IoT
+# IoT
 
-** Šta je IoT
+Stefan Nožinić (<stefan@lugons.org>)
+
+---
+# Šta je IoT
 
  + Internet of Things
  + ideja je da imamo povezane uređaje na internet kao što su: kućni uređaji, automobili, gadgeti itd...
@@ -14,7 +17,8 @@
    + analiza podataka 
 
 
-** Šta većina IoT sistema sadrži
+---
+# Šta većina IoT sistema sadrži
 
  + računar
  + periferni uređaji
@@ -27,39 +31,46 @@
  + sistem za kontrolu
 
 
-** Arhitektura IoT sistema 
+---
+# Arhitektura IoT sistema 
 
  + hijerarhijska
  + peer-to-peer
  + Grid computing?
 
 
-** Raspberry PI
+---
+# Raspberry PI
 
-[[./png/rpi.png]]
+![](./png/rpi.png)
 
-** Arduino Uno
+---
+# Arduino Uno
 
-[[./png/uno.png]]
+![fit](./png/uno.png)
 
-** ESP8266
+---
+# ESP8266
 
-[[./png/esp8266.png]]
+![fit right](./png/esp8266.png)
 
 
-** Periferni uređaji
+---
+# Periferni uređaji
 
  + aktuatori
  + senzori
 
 
-** Načini komunikacije sa perifernim uređajima 
+---
+# Načini komunikacije sa perifernim uređajima 
 
  + polling
  + event-based kroz sistem prekida
 
 
-** Komunikacija sa peerifernim uređajima 
+---
+# Komunikacija sa perifernim uređajima 
 
  + GPIO
  + one wire
@@ -71,30 +82,34 @@
  + SPI
    + 4 pina, SCLK, MOSI, MISO, SS (slave select)
 
-** Komunikacija sa perifernim uređajima
+---
+# Komunikacija sa perifernim uređajima
 
-+ RS-232
-+ I2C
+* RS-232
+* I2C
   + serial data line + serial clock line, START-STOP poruke
-+ USB
-+ CAN - ceo protokol u OSI modelu
-+ IR
+* USB
+* CAN - ceo protokol u OSI modelu
+* IR
 
 
-** RS 232 konektor
+---
+# RS 232 konektor
 
-[[./png/rs232.png]]
-
-
-
-** Komunikacija sa perifernim uređajima
-
- + 802.3
- + 802.11
- + 802.15
+![](./png/rs232.png)
 
 
-** Komunikacija sa centralnom jedinicom (server)
+
+---
+# Komunikacija sa perifernim uređajima
+
+ + 802.3 (Ethernet)
+ + 802.11 (WiFi)
+ + 802.15 (Bluetooth)
+
+
+---
+# Komunikacija sa centralnom jedinicom (server)
 
  + praktično svi protokoli iz računarskih mreža
  + Prva dva nivoa OSI modela:
@@ -103,7 +118,8 @@
    + 802.15
    + 802.3
 
-** Kounikacija sa centarlnom jedinicom
+---
+# Kounikacija sa centarlnom jedinicom
 
  + Aplikativni nivo OSI modela
    + MQTT
@@ -112,7 +128,8 @@
    + custom protokoli
    + ...
 
-** Primeri senzora
+---
+# Primeri senzora
  + touch panel
  + dugme
  + kompas
@@ -122,7 +139,8 @@
  + senzor pritiska
  + smoke detection senzor
 
-** Primeri senzora
+---
+# Primeri senzora
  + IR senzor
  + kamera
  + mikrofon
@@ -131,7 +149,8 @@
  + humidity senzor
 
 
-** Aktuatori
+---
+# Aktuatori
 
  + elektro-motori
  + LED
@@ -139,7 +158,8 @@
  + štampač
  + zvučnik
 
-** Softverska arhitektura embedded sistema
+---
+# Softverska arhitektura embedded sistema
 
  + lower layer
  + middle llayer
@@ -148,7 +168,8 @@
  + RPC
 
 
-** Primeri
+---
+# Primeri
 
  + pametne kuće
  + pametni automobili
