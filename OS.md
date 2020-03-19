@@ -47,14 +47,14 @@ Stefan  Nožinić (stefan@lugons.org)
 
 ---
 # Tipovi registara na CPU
-* program counter - holds address of next instruction
-* accumuative register - holds result of operation
-* memory base register - holds data from memory
-* memory address register
-* instruction register - holds value of current instruction
-* state register - contains various flags (zero, sign (S=1 for negative), carry, overflow)
-* stack pointer
-* general purpose registers (can fetch/put data from/to acumulator)
+* program counter - sadrži adresu naredne instrukcije
+* akumulatorski registar - sadrži rezultat operacije
+* memory base register - sadrži podatke dobijene iz memorije
+* adresni registar
+* instrukcijski registar - sadrži vrednost instrukcije
+* registar stanja - različiti flagovi (zero, sign (S=1 za negativni znak), carry, overflow)
+* pokazivač na stek
+* registri opšte namene 
 
 ---
 # Prekidi
@@ -65,33 +65,35 @@ Stefan  Nožinić (stefan@lugons.org)
 # Elementi OS
 
 
-+ communication with BIOS
-+ memory management 
-+ filesystem
-+ process management
-+ commandline 
++ komunikacija sa BIOS-om
++ upravljanje memorijom
++ sistem datoteka
++ upravljanje procesima
++ komandna linija
++ podsistem za ulazno izlazne uređaje
++ grafičko okruženje
 
 ---
 # Procesi
 
-+ process is formed from three parts:
-  + activity (active / inactive)
-  + image
-   + attributes 
++ Proces se sastoji iz tri dela:
+  + status aktivnosti (active / inactive)
+  + slika procesa 
+   + atributi
 
 ---
 
-+ image is consisted of:
-  + code
-  + stack
-  + heap memory 
++ Slika procesa se sastoji iz:
+  + koda - lista instrukcija
+  + stek
+  + memorijski blokovi korišćeni od strane procesa
+  + stanje svih registara
 
 ---
 + attributes: 
-  + state
-  + priority 
-+ typical states of process are: ready, active and waiting 
-+ quantum: time available per active proess to do execution before it goes into waiting state 
+  + stanje procesa - spreman, čeka, neaktivan
+  + prioritet
++ quantum: vreme dostupno da se pojedinačni proces izvršava pre nego što ode u stanje čekanja
 
 
 ---
@@ -101,20 +103,22 @@ Stefan  Nožinić (stefan@lugons.org)
 
 
 ---
-# Komponenta ya rukovanje procesima
+# Komponenta za rukovanje procesima
 
 + kreiranje procesa
 + ubijanje procesa 
 
 ---
-# Vi[enitno programiranje
+# Višenitno programiranje
 
-this means that two threads cannot write too the same piece of shared memory 
++ Dva procesa se mogu izvršavati paralelno ili pseudo paralelno
++ posebna pažnja se stavlja da dva procesa ne koriste isti resurs u isto vreme (race condition)
++ ovo se omogućava upotrebom mutexa
++ mutex ima lock operaciju koja je atomičnac  (ne može biti prekinuta)
++ kada je mutex već zaključan, pokušaj zaključavanja blokira proces dok mutex ne postane otključan od strane drugog procesa
 
-this is achieved using mutexes 
 
-mutex has lock operation which is atomic  (cannot be interrupted)
-if mutex is locked, lock operation blocks until it is unlocked so we can write 
+---
 
 ```
   thread1()
@@ -133,30 +137,31 @@ if mutex is locked, lock operation blocks until it is unlocked so we can write
   ```
 
   ---
-  # Atomi;ke 
+  # Atomičke sekcije
 
 
-+ sekcija u programu koja ne mo\e biti prekinuta 
++ sekcija u programu koja ne može biti prekinuta 
 
 
 ---
 # Problem 5 filozofa
 
 
-+ we have 5 philosophers with 5 forks and every philosopher to eat needs 2 forks  (left and right of him)
-+ philosophers take forks one by one (left orr right first and then other one) and waits if fork is busy and does not eat 
-+ solution: even ones take left first and odd ones take right first 
++ imamo 5 filozofa i 5 kašika i svakom trebaju dve da bi jeo (leva i desna od njega)
++ svaki filoyof uzima jednu po jednu kašiku i čeka dok nema dve 
++ problemi_
+
+---
++ Rešenje: parni prvo uzmu levu a neparni prvo uzmu desnu
 
 ---
 # Sinhronizacija semaforima
 
-
-+ we have one road and one semaphore
-+ cars can pass through the road one by one on semaphore signal
-+ cars cannot pass when semaphore is off
-+ car passes when semaphore signals
-+ when car passes, semaphore turn off 
-
++ imamo jedan put i jedan semafor
++ automobili mogu da prolaze putem jedan po jedan na semafor signal
++ automobili ne mogu proći kada je semafor isključen
++ automobil prolazi kad semafor signalizira
++ Kada automobil prođe, semafor se isključuje
 ---
 ```
 stop()
@@ -180,82 +185,70 @@ stop()
   # Tajmer
 
   
-
-+ timer is special kind of driver which registers interrupt on timer tick and during handling of this interrupt, timer:
-    + increases system time
-    + checks is current process active above time limit (quantum)
-    + increases total time of current process
-    + checks if processes in sleep should wake up
-    + statistics 
-
++ tajmer je posebna vrsta drajvera koji registruje prekid na otkucaj tajmera i tokom obrade prekida:
+    + povećava sistemsko vreme
+    + provere da li je trenutni proces aktivan iznad vremenskog ograničenja (quantum)
+    + povećava ukupno vreme tekućeg procesa
+    + proverava da li bi se procesi u snu trebali probuditi
+    + statistika
 
 ---
 # Raspoređivanje procesa
 
-
-+ schedulng is process of bringing process to active mode and pausing other processes 
-+ so scheduler must put active process on hold and activate anoother one from list of ready processeswith highest prioority 
-
++ schedulng je proces dovođenja procesa u aktivni režim i pauziranja drugih procesa
++ tako da planer mora staviti aktivni proces na čekanje i aktivirati drugi sa liste spremnih procesa sa najvećim prioritetom
 ---
 # Upravljački programi
 
 
-
-+ exposes driver interface 
-+ for each class of I/O devices this module exposes special driver interface such that drivers can be implemented 
-+ this module for every class of I/O device creates abstraction 
-
++ otkriva upravljački interfejs
++ za svaku klasu I / O uređaja ovaj modul otkriva poseban upravljački interfejs tako da se upravljački programi mogu implementirati
++ ovaj modul za svaku klasu U / I uređaja stvara apstrakciju
 
 ---
 # HDD - organizacija
 
-
-+ control unit:
-    + control logic
-    + address register
-    + data register
-    + status register
-    + time management system 
-+ data storage unit:
-    + address mechanism
-    + memory medium
-    + impulse circuits
-    + output amplifiers 
-
++ kontrolna jedinica:
+    + kontrolna logika
+    + adresni registar
+    + registar podataka
+    + registar statusa
+    + sistem upravljanja vremenom
++ jedinica za skladištenje podataka:
+    + adresni mehanizam
+    + medijum za memoriju
+    + impulsna kola
+    + izlazna pojačala
+---
++ adresni prostor zasnovan je na cilindričnim koordinatama (p, phi, z)
++ staza je krug za zadati radijus na zadanoj visini
++ cilindar je postavljen za sve staze na različitim visinama za dati radijus
++ sektor je deo kruga
++ između svaka dva sektora postoji međusektorska zona
++ pa se svaki sektor može adresirati kao (u, c, t, s) gde je u broj uređaja, c je cilindar, t je staza i s je broj sektora
 ---
 
-+ address space is based on cylindrical coordinates (p, phi, z)
-+ track is circle for given radius on given height 
-+ cylinder is set of all tracks on different heights for given radius 
-+ sector is part of circle 
-+ between every two sectors there is inter-sector zone 
-+ so every sector can be addressed as (u,c,t,s) where u is number of device, c is cylinder, t is track and s is sector number 
++ kapacitet sektora je K i obično je K = 512B
++ kapacitet celog diska: KSTC
++ sektor ima zaglavlje, kontrolni rep (ECC, CRC) i segmente podataka
 
 ---
-
-+ sector capacity is K and is usually K = 512B 
-+ cpacity of whole disk: KSTC 
-+ sector has header, control tail (ECC, CRC) and data segments 
-
----
-
-+ for transfer, we use I/O subsystem 
-+ in I/O subsystem we can only transfer blocks, block is constant number of successive sectors on one trace 
++ za prenos koristimo I / O podsistem
++ u I / O podsistemu možemo prenositi samo blokove, blok je konstantan broj uzastopnih sektora na jednom tragu
 + transfer:
-    + transfer block to RAM (system zone)
-    + activate I/O subsystem
-    + wait for transfer to finish 
+    + prenos bloka u RAM (sistemska zona)
+    + aktiviranje I / O podsistema
+    + čekanje da se transfer završi
 
 ---
 
-+ also it works vice versa for read
-+ I/O subsystem has its bandwidth which depends of data line width and its clock rate 
-+ so CPU sends to disk controller:
-    + R/W
-    + address in RAM
-    + adress on disk
-    + length in blocks 
-
++ takođe deluje obrnuto za čitanje
++ I / O podsistem ima svoj propusni opseg koji zavisi od širine linije podataka i njegove frekvencije takta
++ tako CPU šalje na kontroler diska:
+    + R / V
+    + adresa u RAM-u
+    + adresa na disku
+    + dužina u blokovima
 
 ---
 # Primer čitanja u x86 asm
@@ -281,68 +274,65 @@ stop()
 # Tabele u OS vezane za diskove
 
 ---
-#  Mount table 
+# Mount table 
 
-+ contains device description and mount locations
-+ contains routines for operating with device
-
----
-#  Allocation table 
-
-per device 
-
-+ contains file names and descriptions
-+ index nodes
-+ file extension
-+ file type (binary or text)
-+ version
-+ owner, group and permissions
-+ size
-+ time of creation and modification
-+ hidden, system, etc
-+ other attributes
-+ starting block address or array of addresses of all blocks 
++ sadrži opis uređaja i lokacije za montiranje
++ sadrži rutine za rad sa uređajem
 
 ---
-#  File descriptor table 
+# Tabela raspodele
 
-formed per application running in OS 
+po uređaju
 
-+ which file name is opened
-+ permissions (read / write)
-+ current position 
-
-it always has at least 3 files opened: standard input, standarrd output and standard error which are special files 
++ sadrži imena datoteka i opise
++ čvorovi indeksa
++ ekstenzija datoteke
++ vrsta datoteke (binarna ili tekstualna)
++ verzija
++ vlasnik, grupa i dozvole
++ veličina
++ vreme stvaranja i modifikacije
++ skriveno, sistem itd
++ drugi atributi
++ početna adresa bloka ili niz adresa svih blokova
 
 ---
-# Table of open files 
+# Tabela deskriptora datoteka
 
-one table on whole system 
+formirano po aplikaciji koja se izvodi u OS-u
+
++ ime datoteke 
++ dozvole (čitanje / pisanje)
++ trenutni položaj
+
+uvek ima najmanje 3 datoteke otvorene: standardni ulaz, standardni izlaz i standardni izlaz za greške koje su posebne datoteke
 
 ---
-# Memory module 
+# Tabela otvorenih datoteka
 
-exposes:
+jedna tabela u celom sistemu
 
-+ memory allocation
-+ free(....) functionality 
+---
+# Memorijski modul
 
+izlaže:
 
++ dodeljivanje memorije
++ besplatna (....) funkcionalnost
 ---
 # Memory management 
 
-+ physical address is address on memory while logical address is address of specific process 
-+ process can only access through logical space, MMU (memory management unit) translates logical address to physical like this:
-    + checks if address is greater than limit and throws exception if yes
-    + adds base address to logical address otherwise
++ fizička adresa je realna adresa u memoriji dok je logička adresa adresa iz adresnog prostora konkretnog procesa
++ procesi pristupaju memoriji upotrebom logičkog adresnog prostora, MMU (memory management unit) pretvara logičku u fizičku adresu:
+    + provera da li je adresa van dostupnog opsega, ako jeste, prijavljuje grešku (izuzetak)
+    + dodaje baznu adresu na logičku adresu
 
 
 ---
 # Paging 
 
-+ we have pages where every page has its own logical space 
-+ first n bits of address represent page while rest represents concrete address oon that page 
-
++ Svaka stranica memorije ima svoj logički prostor
++ prvih n bita predstavlja stranicu a ostatak logičku adresu
 
 
 ---
@@ -352,171 +342,167 @@ exposes:
 ---
 # terminology
 
-+ disk - storage for storing data
-+ disk block - minimal amount of data to be read/written
-+ block - basic amount of data, always the same or larger than disk block (natural number multiplied by disk block size)
-+ volume - logical representation of disk or partition of disk
-+ superblock - area where info about volume is stored
-+ metadata
-+ inode - place for storing metadata (FCB, file record)
-+ extent - pair of starting block and length of following block array
-+ attribute - pair of key-value such as filename file size etc
++ disk - uređaj za čuvanje podataka
++ disk block - minimalna količina podataka za upis i čitanje 
++ block - minimalna količina podataka nad kojom se vrše operacije u OS
++ volume - logička reprezentacija diska ili particije diska (dela diska)
++ superblock - zaglavlje volume-a
++ inode - mesto za čuvanje meta podataka o fajlu (FCB, file record)
++ extent - uređeni par početnog bloka i dužine fajla u blokovima
++ attribute - uređeni par ključ ' vrednost (npr ime datoteke, veličina itd)
 
 ---
 # file metadata 
 
-+ file name
-+ file owner
-+ file access permissions
-+ file size
-+ date of creation
-+ date of last read
-+ date of last write
-+ file type
-+ reference to the directory containing the file
-+ pointer to data array of a file (or can be list of pointers to the data blocks)
++ ime datoteke
++ vlasnik datoteke
++ dozvole pristupa
++ veličina datoteke
++ vreme kreiranja
++ vreme poslednjeg čitanja
++ vreme poslednjeg pisanja
++ tip datoteke
++ pokazivač na direktorijum u kom se nalazi datoteka
++ pokazivač na prvi blok ili listu blokova 
 
-also we can store pointer to list of pointers to blocks or, if we want even larger amount of data per file, we can store pointer to pointers to
-pointers to blocks  and this is called double-indirect blocks 
+neke implementacije čuvaju pokazivač na niz pokazivača na blokove ili pokazivač na niz pokazivača na nizove pokazivača na blokove
 
-also we can keep list of extents 
+drugi način je da se čuva lista extent-a 
 
 ---
-# Directory 
+# Direktorijum 
 
-stores list of file inode pointers as well as pointers to other directories 
+čuva listu pokazivača na inode-ove
 
-it can store names with inode pointers 
-
-contents of a directory can be stores as linear list or tree structure such as:
+Sadržaj direktorijuma se može predstaviti različitim strukturama podataka
 
 + B tree
 + B* tree
 + B+ tree 
-
-contents can be saved as hash tables also 
-
----
-# File system operations 
++ hash tabela
 
 ---
-# Initialization 
-
-+ initializes basic empty file system and superblock
-+ be careful to store inode of root directory in superblock 
-+ this is commonly done by separate program not filesystem driver itself 
+# Operacija koje pruža file system
 
 ---
-# Mounting 
+# Inicijalizacija 
 
-+ checking if file system was properly shut down (read indicator in superblock)
-+ fixing filesystem if it is dirty
-+ builds internal superblock in RAM
-
----
-# Unmounting 
-
-+ flushing out buffered data 
-+ modifies superblock is needed
++ kreiranje super bloka i inicijalizacija fajl sistema
++ upis inode-a za korenski direktorijum u super blok 
++ Ovaj posao se obavlja od strane posebnog programa a ne samog drajvera za fajl sistem 
 
 ---
-# Creating files 
+# Montiranje 
 
-takes directory and file name and creates inode 
-
----
-# creating directories 
-
-takes directory and name and creates inode
-
-it also initializes contents of a directory 
-
-initializes reference to itself and to parent directory 
++ Provera da li je fajl sistem pravilno demontiran prilikom poslednje upotrebe
++ popravka u slučaju grešaka
++ prebacivanje super bloka u RAM za lakši pristup
 
 ---
-# opening files 
+# Demontiranje
 
-+ takes directory and name and looks up to find inode
-+ checks permissions and other stuff
-+ returns handle which apps can use to do I/O operations
-
----
-# Writing to files 
-
-+ takes inode (or some kind of handle), position to write, buffer and length of data
-+ writes data and modifies metadata 
++ Svi baferovani podaci u RAM-u se upisuju na FS 
++ modifikacija indikatora uspešnog demontiranja u super bloku
 
 ---
-# Reading files 
+# Kreiranje fajla
 
-+ takes inode (or some kind of handle), position, memory buffer and length
-+ increments file position with amount of data read
-+ maybe modifies metadata? (last read)
++ kao parametar uzima direktorijum i ime fajla i kreira inode
 
 ---
-# Deleting files
+# Kreiranje direktorijuma
 
-+ deletes file from directory
-+ waits to oters close file and then deletes inode and (if needed) data contents
-
----
-# Renaming files 
-
-+ takes source directory, source name, destination directory and destination name
-+ first lock file system such that others cannot mess up
-+ verify if source and destination dirs are same, if they are, simply rename file, otherwise we need to move it
-+ check if destination is not child of source, traverse to the root and see if you hit source from destination
-+ delete destination name if it refers to a file or empty directory
-+ delete source name from source directory
-+ create destination name in destination directory
-+ change parent to destination directory 
++ kao parametar prima roditeljski direktorijum i ime novog direktorijuma
++ kreira inode
++ inicijalizacija sadržaja direktorijuma
++ inicijalizacija reference na sebe i roditeljski direktorijum 
 
 ---
-# Reading metadata 
+# Otvaranje datoteka
 
-+ takes reference to a file
-+ returns some inode fields 
-
----
-# write metadata 
-
-similar to reading metadata but modifies fields 
++ kao parametar prima inode direktorijuma i ime fajla 
++ traži potreban inode za dati fajl
++ provera permisija
++ vraća handle kao povratnu vrednost sa kojom se vrši upis i čitanje od strane aplikativnih programas
 
 ---
-# Opening directory 
+# Upis u fajlove
 
-takes reference to a dir and returns handle 
-
----
-# Reading directory 
-
-takes directory handle and reads contents of a directory and returns something like (name inode) list of pairs 
++ Parametri: handle, pozicija u fajlu gde se upisuje, pokazivač na lokaciju u RAM i dužina podataka
++ upis podataka u datoteku
++ dodavanje novih blokova i modifikacija inode-a ako je potrebno
++ modifikacija meta podataka npr last write
 
 ---
-# Extended operations 
+# Čitanje fajlova
 
-+ symbolic links - entries in a directory that refer to another file names
-+ hard links - entries that map to same inodes
-+ memory mapping of files - map memory buffers to files directly
-+ storing key-value attributes
-+ indexing - setting keywords to a file and saving this in separate structure to reference files later by keywords
++ Parametri: handle, pozicija u fajlu gde se čita, pokazivač na lokaciju u RAM i dužina podataka
++ inkrementiranje potrebnih pokazivača za čitanje
++ modifikacija meta podataka npr last read
+
+---
+# Brisanje datoteke
+
++ provera da li je datoteka u upotrebi
++ brisanje inode-a iz direkktorijuma
++ nekad i brisanje sadržaja
+
+---
+# promena imena i pomeranje fajlova
+
++ uzima imenik izvora, ime izvora, direktorij odredišta i ime odredišta
++ prvi sistem zaključavanja datoteka tako da drugi ne mogu da naprave nered
++ provjerite jesu li izvorni i odredišni direktoriji isti, ako jesu, jednostavno preimenujte datoteku, inače je moramo premjestiti
++ proverite da li odredište nije dete izvora, pređite na koren i pogledajte da li ste pogodili izvor sa odredišta
++ izbrišite odredišno ime ako se odnosi na datoteku ili prazan direktorij
++ obrišite ime izvora iz izvornog direktorija
++ stvorite ime odredišta u direktoriju odredišta
++ promenite nadređeni u odredišni direktorij
+
+---
+# Dobavljanje meta podataka
+
++ kao parametar dobija referencu fajla (često inode)
++ vraća meta podatke za dati inode
+
+---
+# upis meta podataka
+
++ kao čitanje meta podataka, samo modifikacija
+
+---
+# Otvaranje direktorijuma
+
++ kao kod otvaranja fajla
+
+---
+# Čitanje direktorijuma 
+
++ za dati handle, vraća listu uređenih parova (ime, inode)
+
+
+---
+# Dodatne operacije
+
++ simbolički linkovi - fajlovi koji u sebi sadrže putanju do linkovanog fajla
++ hard links - fajlovi koji sadrže referencu do inode-a
++ memory mapping - direktno mapiranje dela memorije na fajl
 + journaling/Logging
 + access control lists
 
 ---
 # Journaling 
 
-main aim is to protect file system from non-consistent writes (e.g. power supply goes off). 
-
-for every write first:
-
-+ we make old content to journal
-+ we label journal as registered
-+ we write data
-+ we label journal as successful
-
-when checking journal, all unregistered ones are made before write so we can delete them and all registered but non successful journals are containing old data which 
-is consistent with the file system so we simply get it back to drive where it belongs 
++ Cilj. zaštita od nekonzistentnog menjanja  
++ Za svaki upis:
+  + upisuje se stari sadržaj u dnevnik
+  + označava se dnevnik kao registrovan
+  + upis podataka normalno
+  + označava se dnevnik kao uspešan
++ prilikom provere: 
+  + brišemo sve neregistrovane jer se upis nije desio
+  + sve uspešne brišemo
+  + sve registrovane ali neuspešne, vraćamo podatke koje smo sačuvali u dnevnik u realni fajl sistem
 
 
 ---
@@ -525,119 +511,59 @@ is consistent with the file system so we simply get it back to drive where it be
 
 
 ---
-# Zero oor empty process 
+# Zero or empty process 
 
-process which is running always and is basic infinite loop
++ proces koji je uvek pokrenut i koji je praktično beskonačna petlja 
++ potreban jer bi u suprotnom, ako nema drugih procesa, računar se isključio 
 
 ---
 #  Scheduler for long term 
 
-copies images of processes to/from mass memory if needed 
++ kopiranje slika procesa sa diska ili na disk
++ potrebno jer bi u suprotnom jako malo procesa moglo da bude pokrenuto
 
 ---
 # Identifier or login
 
-communicates with terminal to enable login of users and then calls shell (communicator process) and waits until it exits, after that, enables login again 
-
-
----
-# Loader and proogram loading 
++ autentifikacija korisnika
++ prilikom uspešne autentifikacije, poziva se shell
 
 ---
-# Introduction 
-
-+ when we compile program into machine code we get object file 
-+ we need to load executable into memory and execute pprogram 
-+ every object file has starting address zero which is impossible to handle when we have multiuser OS 
-+ we need to transform that program into program with new address space provided and calculated by OS 
-+ also program can have subprograms and we need to populate addresses with these subprogramsa but they do not need to be in some specific order nor alligned in series 
-+ for instance we can have A1B1A2B2 for programs A and B 
-+ segment is minimal memory unit where data and program are located 
-+ segment can be smaller than program size so we need to allocate multiple segments which do not need to be in series 
+# Punjenje i punjač programa (loader)
 
 ---
-# Procedura
+# Uvod
 
-+ checking permissions and validation
-+ filling stack with command line arguments
-+ initializing stack pointer and other registers
-+ segment allocation
-+ loaading program into segments
-+ linking - determining values of symbolic references
-+ relocation - setting all adress sensitive locations to new address space
-+ transferring instructions and data into memory (loading)
-+ jumping to start entry and starting execution 
-
----
-# Relocation 
-
-+ loader is responsible to add constant to every relocatable address in program 
-+ after coompiling and assembling, program is relocatable 
-+ after loading, program in memory is absolute addressed
++ prilikom kompajliranja programa u mašinski kod, dobija se objektni fajl 
++ potrebno je učitati fajl u memoriju i početi izvršavanje programa
++ Svaki objektni fajl ima početnu adresu nula, izvršavanje ovakvog koda je nemoguće na višekorisničkom OS
++ potrebna transformacija sa novim adresama izračunae u zavisnosti od toga gde je program učitan u memoriji
++ program može pozivati rutine podprograma koji ne moraju biti poređani pravilnim redosledom
++ program može pozivati rutine eksternih biblioteka
++ segment - minimalna jedinica memorije gde se nalaze kod ili podaci
++ program je skup segmenata, segmenti ne moraju da budu poslagani redom u memoriji
 
 ---
-# Compile and start loader 
+# Procedura pokretan
 
-+ contained in compiler or assembler
-+ very simple
-+ unnecessary using memory
-+ program needs to be always compiled before execution
-+ very hard to maintain large number of big segments 
-
----
-# Absolute loader 
-
-+ assembler forms absolutew program
-+ neegates nature of assembler
-+ mpossible to solve issue when we have multiple subprograms 
++ validacija i provera dozvola 
++ popunjavanje steka argumentima sa komandne linije
++ inicijalizacija pokazivača na stek i drugih registara
++ alokacija segmenata
++ učitavanje programa u segmente
++ učitavanje eksternih biblioteka
++ linking - računanje vrednosti simboličkih referenci
++ relocation - transformacija adresa u kodu
++ kreiranje procesa
 
 ---
-# BSS loader 
+# Linux kao primer
 
-+ more segments for program
-+ same segment for data 
-+ output of assembler is program and information to which programs (external) is that program dependable
-
----
-# Relocatable loader with direct binding 
-
-+ more segments for data
-+ more segments for program
-
-compiler gives:
-
-+ dictionary of external symbols - info on all input and output symbols
-+ text table - compiled relocatable code
-+ relocatable listing - infoormation of all address-sensitive locations in program
-
-
-first phase of loading:
-
-+ allocate memory for each segment
-+ forming symbol table for global symbols and their absolute addresses 
-
-second phase: 
-
-+ modifying code to relocate its address references tto new addresses 
-
-
----
-# Dynamic loader 
-
-when we in execution reference global (extern) symbol, it is loaded then and not before that 
-
----
-# Linking strategies 
-
-+ in-segment - for locations in same segment
-+ inter-segment - for locations in different segments 
-
-
-so we need to classify symbols in procedure as local and as global for that procedure 
-
-when we find address sensitive location in code, we fetch: 
-
-+ symbol name to which code references
-+ instruction location (offset of segment start)
-+ instruction type 
-
++ login
++ shell
++ file system
++ loading
++ scheduling
++ driver interface
++ /proc 
++ /sys
