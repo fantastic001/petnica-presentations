@@ -1,0 +1,14 @@
+digraph G {
+    splines=ortho;
+
+    sl [label="Sekvencijalna logika"];
+    clock [label="clock"];
+    cl [label="Kombinatorna logika"];
+    input [label="RAM"];
+    sl -> cl [xlabel="prethodno stanje", color="blue", fontcolor="blue"];
+    cl -> sl [xlabel = "novo stanje", color="red", fontcolor="red"];
+    clock -> sl;
+    input -> sl;
+    clock -> input;
+    sl -> input;
+}

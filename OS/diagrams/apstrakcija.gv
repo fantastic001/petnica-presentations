@@ -1,0 +1,10 @@
+digraph G {
+    rankdir="BT";
+    "Operativni sistem" -> "Aplikativni sloj";
+    "BIOS" -> "Operativni sistem";
+    "Instrukcijski skup" -> "BIOS";
+    "Procesor" -> "Instrukcijski skup";
+    "Sekvencijalna kola" -> "Procesor";
+
+    "Digitalna elektronika" -> "Sekvencijalna kola";
+}

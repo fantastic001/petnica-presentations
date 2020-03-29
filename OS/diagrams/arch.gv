@@ -1,0 +1,5 @@
+digraph G {
+    splines="ortho";
+    "CPU" -> RAM [dir=none];
+    CPU -> IO [dir=none];
+}

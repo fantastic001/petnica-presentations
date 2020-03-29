@@ -21,16 +21,45 @@ Stefan  Nožinić (stefan@lugons.org)
 # Apstrakcija u računarstvu 
 
 ---
+![bg contain](diagrams/apstrakcija.png)
+
+---
 # Model u diskretnom vremenu
+
+---
+![bg contain](diagrams/dtm.png)
 
 ---
 # Instrukcijski skup
 
+* skup svih insukrukcija koje procesor razume 
+* jako primitivne i male operacije
+* ipak, dovoljne za opis bilo kakvog programa!
+* Dva glavna pristupa
+  * RISC
+  * CISC
+
 ---
 # Arhitektura računara
 
+
+---
+![bg contain](diagrams/arch.png)
+
+
 ---
 # CPU 
+
+---
+# Tipovi registara na CPU
+* program counter - sadrži adresu naredne instrukcije
+* akumulatorski registar - sadrži rezultat operacije
+* memory base register - sadrži podatke dobijene iz memorije
+* adresni registar
+* instrukcijski registar - sadrži vrednost instrukcije
+* registar stanja - različiti flagovi (zero, sign (S=1 za negativni znak), carry, overflow)
+* pokazivač na stek
+* registri opšte namene 
 
 ---
 # Memorija
@@ -46,20 +75,30 @@ Stefan  Nožinić (stefan@lugons.org)
 * na primer, HDD, USB, PCIe, ...
 
 ---
-# Tipovi registara na CPU
-* program counter - sadrži adresu naredne instrukcije
-* akumulatorski registar - sadrži rezultat operacije
-* memory base register - sadrži podatke dobijene iz memorije
-* adresni registar
-* instrukcijski registar - sadrži vrednost instrukcije
-* registar stanja - različiti flagovi (zero, sign (S=1 za negativni znak), carry, overflow)
-* pokazivač na stek
-* registri opšte namene 
-
----
 # Prekidi
 
 * način da se softver obavesti o određenim događajima sa spoljašnje strane
+
+```asm
+rutina1:
+  instrukcija 
+  instrukcija 
+  instrukcija 
+
+rutina2:
+  instrukcija 
+  instrukcija 
+
+main:
+  prva instrukcija koja se izvrsava
+  registracija prekida za rutina1 i rutina2
+  instrukcija 
+  instrukcija 
+  instrukcija 
+```
+
+* prekidi mogu biti softverski i hardverski
+* nastaju prilikom pobude određenih pinova  na CPU
 
 ---
 # Elementi OS
@@ -99,7 +138,7 @@ Stefan  Nožinić (stefan@lugons.org)
 ---
 # CPU komponenta
 
-+ daje pristup ostalim delovima sistema ya rukovanje prekidima 
++ daje pristup ostalim delovima sistema za rukovanje prekidima 
 
 
 ---
@@ -280,7 +319,7 @@ stop()
 + sadrži rutine za rad sa uređajem
 
 ---
-# Tabela raspodele
+# Tabela raspodele (allocation table)
 
 po uređaju
 
@@ -318,7 +357,7 @@ jedna tabela u celom sistemu
 izlaže:
 
 + dodeljivanje memorije
-+ besplatna (....) funkcionalnost
++ free(....) funkcionalnost
 ---
 # Memory management 
 
@@ -340,7 +379,7 @@ izlaže:
 
 
 ---
-# terminology
+# terminologija
 
 + disk - uređaj za čuvanje podataka
 + disk block - minimalna količina podataka za upis i čitanje 
@@ -504,6 +543,13 @@ Sadržaj direktorijuma se može predstaviti različitim strukturama podataka
   + sve uspešne brišemo
   + sve registrovane ali neuspešne, vraćamo podatke koje smo sačuvali u dnevnik u realni fajl sistem
 
+
+---
+# Upravljački programi
+
+* pružaju interfejs ka aplikativnom sloju ya određene IO uređaje)
+* OS specificira jednistveni interfejs koji svaki drajver implementira 
+* primer: Linux: https://github.com/fantastic001/linux-lab/tree/master/ioctl
 
 ---
 # Demoni
