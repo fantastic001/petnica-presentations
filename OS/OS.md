@@ -543,14 +543,6 @@ Sadržaj direktorijuma se može predstaviti različitim strukturama podataka
   + sve uspešne brišemo
   + sve registrovane ali neuspešne, vraćamo podatke koje smo sačuvali u dnevnik u realni fajl sistem
 
-
----
-# Upravljački programi
-
-* pružaju interfejs ka aplikativnom sloju ya određene IO uređaje)
-* OS specificira jednistveni interfejs koji svaki drajver implementira 
-* primer: Linux: https://github.com/fantastic001/linux-lab/tree/master/ioctl
-
 ---
 # Demoni
 + procesi pokrenuti u pozadini
