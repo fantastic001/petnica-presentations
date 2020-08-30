@@ -216,10 +216,9 @@ $$ T(t_x, t_y, t_z) = \begin{bmatrix} 0 & 0 & 0 & t_x\\
 * dobijamo novi vektor iz normalnog i up vektora 
 * pravimo matricu A od vektora u,v,n
 * $$ C = A^TT $$ 
-* $$ T = (-x_c, -y_c, -z_c) %% 
+* $$ T = (-x_c, -y_c, -z_c) $$
 
 ---
-
 # perspective transform
 
 * *perspektiva* - bliže stvari su veće
@@ -257,14 +256,19 @@ $$ T(t_x, t_y, t_z) = \begin{bmatrix} 0 & 0 & 0 & t_x\\
 
 * skaliranje na prostor (-1, 1)
 
+---
+# GPU arhitektura
+
+
+![](./png/12.png)
 
 ---
 # GPU pipeline
 
 * vertex shader 
 * generisanje primitiva  i clipping 
+* rasterizacija  - izlaz je skup fragmenata
 * fragment shader
-* rasterizacija 
 
 
 
@@ -291,13 +295,19 @@ $$ T(t_x, t_y, t_z) = \begin{bmatrix} 0 & 0 & 0 & t_x\\
 ```
 
 ---
+# Načini iscrtavanja 
+
+![](./png/11.png)
+
+---
 # Komunikacija sa GPU
 
-* vertex buffer 
-* index buffer 
-* color buffer 
-* texture
-* transformacije 
+* shaderi se kompajliraju i salju na GPU gde se izvrsavaju
+* vertex buffer - buffer u koji stavljamo sve vertekse koje saljemo na GPU u njihovom model prostoru
+* index buffer - po kom redosledu zelimo da iscrtavamo vertekse
+* color buffer - boje svakog verteksa
+* texture - koordinate na teksturi, teksturu saljemo posebno
+* transformacije
 
 ---
 # Teksture u fragment shaderu 
@@ -314,16 +324,6 @@ $$ T(t_x, t_y, t_z) = \begin{bmatrix} 0 & 0 & 0 & t_x\\
     gl_FragColor = color * texture2D(texMap, st);
   }
 ```
-
-
----
-# Model u 3D 
-
-* vertex buffer 
-* index buffer
-* texture coordinates buffer
-* default color buffer 
-
 
 ---
 # Svetlo 
