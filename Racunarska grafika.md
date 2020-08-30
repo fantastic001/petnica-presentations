@@ -1,3 +1,7 @@
+---
+marp: true
+---
+
 
 # Računarska grafika (i svašta još nešto)
 
@@ -18,9 +22,9 @@ Agenda
 ---
 # Slika i RGB sistem boja 
 
-* sliku preddstavljamo kao 2D matricu gde svaka ćelija sadrži trojku (r,g,b)
+* sliku predstavljam kao 2D matricu gde svaka ćelija sadrži trojku (r,g,b)
 * brojevi u trojci reprezentuju količinu crvene, zelene i plave boje (3 bajta)
-* Razlog za izbor RGB je aditivnost boja (ekran računara radi tako što mea crvenu, zelenu i plavu svetlost da napravi ceo spektrum boja)
+* Razlog za izbor RGB je aditivnost boja (ekran računara radi tako što meša crvenu, zelenu i plavu svetlost da napravi ceo spektrum boja)
 * RYB nije moguće koristiti kada radimo sa svetlošću jer, na primer, ne možemo dobiti zelenu boju (za razliku od mastila)
 
 
@@ -32,10 +36,21 @@ Agenda
 * CMYK
 
 ---
+# CMYK 
+
+![](./png/cmyk.jpg)
+
+---
+# HSV 
+
+![](./png/hsv.jpeg)
+
+
+---
 # HSV
 
 * $$ V = \frac{R+G+B}{3} $$
-* $$ 1 - \frac{3}{R+G+B}\min(R,G,B) $$
+* $$ S = 1 - \frac{3}{R+G+B}\min(R,G,B) $$
 * $$ H = \cos^{-1}(\frac{2R - B-G}{2\sqrt{(R-G)^2 + (R-B)(G-B)}}) $$ 
 * za G>B
 *  H = 360 - H  za B>G 
@@ -50,10 +65,26 @@ Agenda
 * rotacija
 
 ---
+# Slika kao signal
+
+![](./png/continious-discrete.png)
+
+
+---
+![](./png/signal.png)
+
+
+---
 # Slika kao signal 
 
 * model
-* interpolacija uvod 
+* $$ I(i,j) $$
+* $$ f(x,y) = f(i dx, j dy ) $$
+
+---
+# Interpolacija 
+
+![](bilinear-interpolation.svg)
 
 ---
 # Translacija 
@@ -79,19 +110,12 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 
 
 ---
-# Vektoorska grafika
+# Vektorska grafika
 
 * ne čuvamo piksele već informacije o oblicima
 * linija
 * luk
 * ostali oblici 
-
----
-# Crtanje linije na ekranu 
-
-* $$ y = kx + n $$
-* $$ k = \frac{y_2 - y_1}{x_2 - x_1} $$
-* $$ n = y_1 - kx_1 $$
 
 ---
 # 3D grafika 
@@ -111,36 +135,31 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 * ortogonalni vektori (normalni)
 * vektorski proizvod 
 * jedinični vektor
+* Za nas, niz od 3 ili 4 broja, najčešće tipa float
+
 
 ---
 # Matrice
 
-* sistemi linearnih jednačina  i matrična reprezentacija
+* sistemi linearnih jednačina i matrična reprezentacija
 * determinante 
 * množenje matrice vektorom
 * množenje matrica 
 * jedinična matrica
 * inverzna matrica 
 
-
----
-# Rang matrice
-
-* definicija ranga preko sistema linearnih jednačina 
-
 ---
 # Vektorski prostori 
 
 * linearna kombinacija vektora
-* linearna (ne)zavinost
+* linearna (ne)zavisnost
 * definicija vektorskog prostora 
 * baza vektorskog prostora 
-* kolona prostor 
 
 ---
 # Vektorska notacija 
 
-* verteks možemo predstaviti kao vektor (x,y,z)
+* verteks možemo predstaviti kao vektor (x,y,z, w) gde je w=1 uvek 
 * sve linearne transformacije (rotacija i skaliranje) možemo predstaviti u matričnom obliku
 
 ---
@@ -148,12 +167,43 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 
 * rotacija
 * skaliranje
+
+---
+# Skaliranje 
+$$ S(s_x,s_y,s_z) = \begin{bmatrix} 
+s_x & 0 & 0 & 0\\
+0 & s_y & 0 & 0\\
+0 & 0 & s_z & 0\\
+0 & 0 & 0 & 1 \end{bmatrix} $$
+
+---
+# Rotacija oko x-ose
+
+$$
+R_x(\theta) = \begin{bmatrix} 
+0 & 0 & 0 & 0\\
+0 & \cos\theta & -\sin\theta & 0\\
+0 & \sin\theta & \cos\theta & 0\\
+0 & 0 & 0 & 1 \end{bmatrix} 
+$$
+
+---
+# Translacija 
+
 * translacija 
-* $$ x' = TRSx $$ 
+
+$$ T(t_x, t_y, t_z) = \begin{bmatrix} 0 & 0 & 0 & t_x\\
+ 0 & 0 & 0 & t_y\\
+  0 & 0 & 0 & t_z\\
+   0 & 0 & 0 & 1 \end{bmatrix} $$
+
+
+
 
 ---
 # Različiti pogledi na objekat 
 
+* $$ x' = TRSx $$ 
 * model space
 * camera space
 * perspektivna projekcija 
@@ -162,16 +212,34 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 # Camera space 
 
 * $$ C = R_CT_C $$ 
-* imamo up vektor i normalni vektoor ravni kamere 
+* imamo up vektor i normalni vektor ravni kamere 
 * dobijamo novi vektor iz normalnog i up vektora 
 * pravimo matricu A od vektora u,v,n
 * $$ C = A^TT $$ 
 * $$ T = (-x_c, -y_c, -z_c) %% 
 
 ---
-# Clipping
 
-* skaliranje na prostor (-1, 1)
+# perspective transform
+
+* *perspektiva* - bliže stvari su veće
+* blize stvari zaklanjaju dalje
+* *frustrum* - deo sveta koji vidimo
+* FoV, aspect ratio, ...
+
+---
+
+# perspective transform
+* od $[-afz, afz]\times[-fz,fz]\times[-z_n,-z_f]$
+* do $[-a,a]\times[-1,1]\times[-1,1]$, ali pazeći na perspektivu
+
+---
+
+# perspective transform
+
+* delimo $x$ i $y$ sa $z$
+* homogenous divide: $\mathrm{hdiv}(x,y,z,w)=(\frac xw,\frac yw, \frac zw, 1)$
+* stavimo $w = -z$
 
 
 ---
@@ -183,13 +251,21 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 * $$ x_p = -\frac{y}{z/d} $$ 
 * $$ z = -d $$ 
 
+
+---
+# Clipping
+
+* skaliranje na prostor (-1, 1)
+
+
 ---
 # GPU pipeline
 
 * vertex shader 
 * generisanje primitiva  i clipping 
-* rasterizacija 
 * fragment shader
+* rasterizacija 
+
 
 
 ---
@@ -253,7 +329,7 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 # Svetlo 
 
 * podešava se u fragment shaderu jer on određuje boju 
-* ambijentno svetlo 
+* ambijentalno svetlo 
 * Tačkasti izvor
 * $$ I(p) = \frac{1}{|p - p_0|^2}I(p_0) $$ 
 * reflektor
@@ -262,7 +338,7 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 ---
 # Svojstva materijala
 
-* ambijentno svojstvo 
+* ambijentalno svojstvo 
 * difuzija 
 * tačkasto svetlo
 * $$ I_a = K_AI_A $$ 
@@ -362,12 +438,12 @@ $$ y' = \sin{\theta}x + \cos{\theta}y $$
 
 * opisani su diferencijalnim jednačinama 
 * translatorno kretanje tela - review 
-* rotacioo kretanje
+* rotaciono kretanje
 * kretanje tkanine - Hook-ov zakon
 
 
 ---
-# Metode za rešaanje diferencijalnih jednačina 
+# Metode za rešavanje diferencijalnih jednačina 
 
 * jednačine prvog reda: Ojlerov metod
 * jednačine višeg reda: Ojlerov metod
