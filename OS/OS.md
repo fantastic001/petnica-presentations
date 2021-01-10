@@ -187,8 +187,8 @@ main:
 
 
 + imamo 5 filozofa i 5 kašika i svakom trebaju dve da bi jeo (leva i desna od njega)
-+ svaki filoyof uzima jednu po jednu kašiku i čeka dok nema dve 
-+ problemi_
++ svaki filozof uzima jednu po jednu kašiku i čeka dok nema dve 
++ problemi?
 
 ---
 + Rešenje: parni prvo uzmu levu a neparni prvo uzmu desnu
