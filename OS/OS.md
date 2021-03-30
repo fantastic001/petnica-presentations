@@ -1,5 +1,5 @@
 ---
-marp: true
+marp: false
 ---
 
 # Operativni sistemi 
@@ -32,7 +32,7 @@ Stefan  Nožinić (stefan@lugons.org)
 ---
 # Instrukcijski skup
 
-* skup svih insukrukcija koje procesor razume 
+* skup svih instrukrukcija koje procesor razume 
 * jako primitivne i male operacije
 * ipak, dovoljne za opis bilo kakvog programa!
 * Dva glavna pristupa
@@ -64,6 +64,7 @@ Stefan  Nožinić (stefan@lugons.org)
 ---
 # Memorija
 
+* registar 
 * SRAM
 * DRAM
 * eksterni medium
@@ -74,10 +75,17 @@ Stefan  Nožinić (stefan@lugons.org)
 * podsistem za komunikaciju sa eksternim uređajima
 * na primer, HDD, USB, PCIe, ...
 
+
+---
+
+![bg contain](diagrams/mmio.png)
+
 ---
 # Prekidi
 
 * način da se softver obavesti o određenim događajima sa spoljašnje strane
+---
+
 
 ```asm
 rutina1:
@@ -97,17 +105,50 @@ main:
   instrukcija 
 ```
 
+---
+
+* mogu se desiti bilo kada ali se na nivou CPU oni sinhronizuju u odnosu na granice instrukcije
 * prekidi mogu biti softverski i hardverski
-* nastaju prilikom pobude određenih pinova  na CPU
+* nastaju prilikom pobude određenih pinova na CPU
+
+---
+# Maskiranje 
+
+* CPU ima registar gde svaki bit označava da li je određeni prekid ignorisan ili ne
+* prekid se aktivira ako se pobudi pin i ako nije ignorisan 
+* postoje ne-maskirajući prekidi koji se aktiviraju prilikom fatalnih grešaka:
+  * deljenje nulom 
+  * pristup nedozvoljenoj memoriji (o ovome kasnije)
+  * watchdog IRQ
+  * reset 
+
+
+--- 
+# Ko sve može da napravi prekid
+
+* sam CPU (softverski prekid)
+* eksterni uređaj 
+* watchdog 
+* reset
+* sat 
+
+---
+# Šta sve treba da uradimo prilikom prekida
+
+* sačuvati stanje svih registara 
+* identifikacija ko je prouzrokovao prekid 
+* provera i reset flaga za dati prekid 
+* pozvati rutinu za obradu prekida datog tipa za dati izvor 
+* vraćanje starog stanja i prebacivanje PC na prethodni deo koda odakle je prekid nastao
 
 ---
 # Elementi OS
 
 
 + komunikacija sa BIOS-om
++ upravljanje procesima
 + upravljanje memorijom
 + sistem datoteka
-+ upravljanje procesima
 + komandna linija
 + podsistem za ulazno izlazne uređaje
 + grafičko okruženje
@@ -118,7 +159,7 @@ main:
 + Proces se sastoji iz tri dela:
   + status aktivnosti (active / inactive)
   + slika procesa 
-   + atributi
+  + atributi
 
 ---
 
@@ -136,10 +177,13 @@ main:
 
 
 ---
-# CPU komponenta
+# Sistemski pozivi 
 
-+ daje pristup ostalim delovima sistema za rukovanje prekidima 
-
+* aplikacija postavi prekid i u registre upiše parametre sistemskog poziva
+  * identifikator poziva
+  * ostali parametri 
+* pozove se rutina za rukovanje sistemskim pozivima 
+* proces prelazi u stanje čekanja dok se njegov zahtev ne ispuni 
 
 ---
 # Komponenta za rukovanje procesima
@@ -153,7 +197,7 @@ main:
 + Dva procesa se mogu izvršavati paralelno ili pseudo paralelno
 + posebna pažnja se stavlja da dva procesa ne koriste isti resurs u isto vreme (race condition)
 + ovo se omogućava upotrebom mutexa
-+ mutex ima lock operaciju koja je atomičnac  (ne može biti prekinuta)
++ mutex ima lock operaciju koja je atomična  (ne može biti prekinuta)
 + kada je mutex već zaključan, pokušaj zaključavanja blokira proces dok mutex ne postane otključan od strane drugog procesa
 
 
@@ -187,8 +231,8 @@ main:
 
 
 + imamo 5 filozofa i 5 kašika i svakom trebaju dve da bi jeo (leva i desna od njega)
-+ svaki filoyof uzima jednu po jednu kašiku i čeka dok nema dve 
-+ problemi_
++ svaki filozof uzima jednu po jednu kašiku i čeka dok nema dve 
++ problemi?
 
 ---
 + Rešenje: parni prvo uzmu levu a neparni prvo uzmu desnu
@@ -236,6 +280,35 @@ stop()
 
 + schedulng je proces dovođenja procesa u aktivni režim i pauziranja drugih procesa
 + tako da planer mora staviti aktivni proces na čekanje i aktivirati drugi sa liste spremnih procesa sa najvećim prioritetom
+
+
+
+
+---
+# Memorijski modul
+
+izlaže:
+
++ dodeljivanje memorije
++ free(....) funkcionalnost
+
+---
+# Memory management 
+
++ fizička adresa je realna adresa u memoriji dok je logička adresa adresa iz adresnog prostora konkretnog procesa
++ procesi pristupaju memoriji upotrebom logičkog adresnog prostora, MMU (memory management unit) pretvara logičku u fizičku adresu:
+    + provera da li je adresa van dostupnog opsega, ako jeste, prijavljuje grešku (izuzetak)
+    + dodaje baznu adresu na logičku adresu
+
+
+---
+# Paging 
+
++ Svaka stranica memorije ima svoj logički prostor
++ prvih n bita predstavlja stranicu a ostatak logičku adresu
+
+
+
 ---
 # Upravljački programi
 
@@ -243,6 +316,14 @@ stop()
 + otkriva upravljački interfejs
 + za svaku klasu I / O uređaja ovaj modul otkriva poseban upravljački interfejs tako da se upravljački programi mogu implementirati
 + ovaj modul za svaku klasu U / I uređaja stvara apstrakciju
+
+
+--- 
+# DMA 
+
+![bg contain](diagrams/dma.png)
+
+
 
 ---
 # HDD - organizacija
@@ -350,29 +431,6 @@ uvek ima najmanje 3 datoteke otvorene: standardni ulaz, standardni izlaz i stand
 # Tabela otvorenih datoteka
 
 jedna tabela u celom sistemu
-
----
-# Memorijski modul
-
-izlaže:
-
-+ dodeljivanje memorije
-+ free(....) funkcionalnost
----
-# Memory management 
-
-+ fizička adresa je realna adresa u memoriji dok je logička adresa adresa iz adresnog prostora konkretnog procesa
-+ procesi pristupaju memoriji upotrebom logičkog adresnog prostora, MMU (memory management unit) pretvara logičku u fizičku adresu:
-    + provera da li je adresa van dostupnog opsega, ako jeste, prijavljuje grešku (izuzetak)
-    + dodaje baznu adresu na logičku adresu
-
-
----
-# Paging 
-
-+ Svaka stranica memorije ima svoj logički prostor
-+ prvih n bita predstavlja stranicu a ostatak logičku adresu
-
 
 ---
 # Sistem datoteka - filesystem
@@ -582,7 +640,7 @@ Sadržaj direktorijuma se može predstaviti različitim strukturama podataka
 + program je skup segmenata, segmenti ne moraju da budu poslagani redom u memoriji
 
 ---
-# Procedura pokretan
+# Procedura pokretanja
 
 + validacija i provera dozvola 
 + popunjavanje steka argumentima sa komandne linije
