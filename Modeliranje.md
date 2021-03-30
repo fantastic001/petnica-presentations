@@ -1,8 +1,22 @@
+---
+marp: false
+---
+
 
 * Modeliranje softvera 
 
 ---
-# blackbox 
+# blackbox - sistem
+
+---
+# Šta je to informacioni sistem?
+
+* akvizicija podataka 
+* čuvanje podataka 
+* prenos podataka
+* prezentacija podataka
+* obrada podataka
+* automatizacija u realnim sistemima (kontrola)
 
 ---
 # Zašto modeliramo softver?
@@ -21,7 +35,56 @@
 * upotrebljivost
 * sigurnost
 * brzina
+* dokumentacija
 
+---
+# Faze izrade softvera
+
+* analiza biznisa
+* analiza zahteva 
+* specifikacija arhitekture
+* prototip i detaljna specifikacija
+* plan verifikacije i validacije 
+* implementacija i jedinično testiranje
+* sistemsko testiranje
+* funkcionalno testiranje
+* pisanje korisničke dokumentacije
+
+
+---
+# Analiza biznisa
+
+* intervju
+* analiza poslovnih procesa kroz postojeću dokumentaciju
+* posmatranje poslovnih procesa
+* poređenjem sa postojećim realnim sistemima
+* analiza sličnih IS
+
+---
+# Analiza korisničkih zahteva
+
+* Razdvajanje zahteva na male komponente 
+* po feature-u
+* zahtevi mogu biti u obliku "Kada .... i želim da .... onda .... i desi se ..."
+* Uzeti u obzir krajnje rokove za dostavljanje softvera
+* ograničenja
+* standardi koje softver treba da ispunjava?
+* funkcionalni i nefunkcionalni zahtevi 
+
+---
+# Use Case Diagram
+
+![./png/use-case.png](./png/use-case.png)
+
+
+---
+# Modeli razvoja
+
+* waterfall
+* code and fix
+* waterfall sa podelom na podprojekte posle specifikacije arhitekture
+* evolutivni razvoj 
+* Scrum 
 
 ---
 # Specifikacija 
@@ -32,6 +95,60 @@
 * definisane ulaza i izlaza svakog modula
 * kako moduli interaguju?
 
+
+---
+# Specifikacija arhitekture
+
+* Da li se koristi neki algoritam koji zahteva specifičnu arhitekturu?
+* moduli mogu biti: podsistemi, klase, namespace, aplikacije, ...
+* definisati komunikaciju između modula
+* specificirati 20% modula koji čine 80% sistema
+* svi zahtevi moraju biti pokriveni arhitekturom
+
+
+--- 
+# Obrasci arhitektura
+
+* slojeviti obrazac
+* mikroservisi
+* pipeline
+* event-driven sa deljenim bus-om
+
+
+---
+# Šta još ide u arhitekturu?
+
+* model podataka (koja baza, koji formati fajlova, koje strukture podataka, ...)
+* upravljanje resursima (memorija, mrežne konekcije, threadovi, ...)
+* Bezbednost i sigurnost 
+* Skalabilnost 
+* interoperabilnost 
+* internacionalizacija i lokalizacija
+* upravljanje greškama
+* pouzdanost
+* okruženje
+
+
+---
+# Alati koji se moraju izlistati u arhitekturi
+
+* build system 
+* continious integration 
+* continious delivery
+* nightly build 
+* containerization engine 
+* profiling tools
+* testing frameworks (unit, integration, system testing)
+* code coverage tools
+* static code analysis tools
+* documentation handling
+
+---
+
+* using existing technologies
+* determining stability of system (multiplied stability concern for every component)
+* is something done before? how existing code can be reused?
+* strategy for handling changes
 
 ---
 # Primer: Facebook
@@ -96,6 +213,19 @@
 * modul za sistem datoteka
 * modul za rukovanje korisnicima
 * grafika?
+
+
+---
+# Implementacija
+
+* OOP, FP, PP, DSL, LP
+* SOLID principi
+* composite, observer, builder, abstract factory
+* OOP: Java, C++, Python
+* FP: Haskell, Lisp
+* PP: C, Assembly
+* LP: Prolog
+* DSL: zavisi od namene!
 
 
 ---
