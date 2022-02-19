@@ -158,6 +158,11 @@ A     | B        | $600   | $1000
 
 
 ---
+# Coinbase
+
+* zašto bi neko validirao blokove ako može da se osloni na druge čvorove da rade težak posao?
+
+---
 ![bg contain](./diagrams/9.png)
 
 
