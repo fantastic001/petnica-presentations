@@ -95,7 +95,9 @@ typedef struct ListElem_t
 
 ListElem* create_element(int value, ListElem* next)
 {
-        ListElem* elem = (ListElem*) malloc(sizeof(ListElem));
+        ListElem* elem = (ListElem*) malloc(
+          sizeof(ListElem)
+        );
         elem->value = value;
         elem->next = next;
         return elem;
@@ -255,9 +257,15 @@ add a b = a+b
 \begin{lstlisting}
 squares = [x*x | x <- [1..10]]
 
-squaresDiv3 = [x*x | x <- [1..10], x*x `mod` 3 == 0]
+squaresDiv3 = [x*x | x <- [1..10], 
+        x*x `mod` 3 == 0
+    ]
 
-unitcircle = [(x,y) | x <- [0, 0.01..10], y <- [0,0.01..10], x*x + y*y < 1]
+unitcircle = 
+    [(x,y) | 
+     x <- [0, 0.01..10], 
+     y <- [0,0.01..10], x*x + y*y < 1
+    ]
 \end{lstlisting}
 \end{frame}
 
@@ -305,7 +313,8 @@ reduce f z (x:xs) = reduce f (f z x) xs
 
 myfilter :: (a -> Bool) -> [a] -> [a]
 myfilter _ [] = [] 
-myfilter f (x:xs) = if (f x) then x : (myfilter f xs) 
+myfilter f (x:xs) = 
+  if (f x) then x : (myfilter f xs) 
 	else myfilter f xs
 
 *Main> mymap (+ 1) [1,2,3]
@@ -326,7 +335,9 @@ myfilter f (x:xs) = if (f x) then x : (myfilter f xs)
 norepeat :: (Eq a) => [a] -> [a]
 norepeat [] = [] 
 norepeat (x:[]) = [x]
-norepeat (x:y:xs) = if x == y then norepeat (x:xs) else x:(norepeat (y:xs))
+norepeat (x:y:xs) = if x == y 
+   then norepeat (x:xs) 
+   else x:(norepeat (y:xs))
 
 *Main> norepeat [1,1,2,5,5,6]
 [1,2,5,6]
@@ -347,7 +358,8 @@ norepeat (x:y:xs) = if x == y then norepeat (x:xs) else x:(norepeat (y:xs))
 \begin{lstlisting}
 qsort :: [Int] -> [Int]
 qsort [] = []
-qsort l = (qsort [x | x<-l, x < y]) ++ [y] ++ (qsort [x | x<-l, x>y]) where y = (head l)
+qsort l = (qsort [x | x<-l, x < y]) ++ [y] 
+    ++ (qsort [x | x<-l, x>y]) where y = (head l)
 \end{lstlisting}
 \end{frame}
 
@@ -358,9 +370,11 @@ findFirstWord :: [Char] -> ([Char], [Char])
 findFirstWord "" = ("", "")
 findFirstWord " " = ("", "")
 findFirstWord s =
-    let (remaining, others) = findFirstWord $ tail s
+  let 
+    (remaining, others) = findFirstWord $ tail s
         x = head s
-    in if x == ' ' then ("", tail s) else (x : remaining, others)
+    in if x == ' ' then ("", tail s) 
+       else (x : remaining, others)
 
 split :: [Char] -> [[Char]]
 split "" = []
@@ -375,7 +389,7 @@ split s = let (x, y) = findFirstWord s
 strlen :: String -> Int
 strlen s
     | s == "" = 0
-        | otherwise = 1 + (strlen $ tail s)
+    | otherwise = 1 + (strlen $ tail s)
 \end{lstlisting}
 \end{frame}
 
@@ -407,12 +421,14 @@ data Zipper a = Zip [a] a [a] deriving (Show)
 
 right :: Zipper a -> Zipper a
 right (Zip l focus []) = Zip l focus [] 
-right (Zip l focus r) = Zip (focus:l) (head r ) (tail r)
+right (Zip l focus r) = 
+    Zip (focus:l) (head r ) (tail r)
 
 
 left :: Zipper a -> Zipper a
 left (Zip [] focus r) = Zip [] focus r
-left (Zip l focus r) = Zip (tail l) (head l) (focus:r)
+left (Zip l focus r) = 
+    Zip (tail l) (head l) (focus:r)
 
 \end{lstlisting}
 \end{frame}
@@ -453,25 +469,30 @@ tolist n = let l = tolist $ left n
                r = tolist $ right n
                v = value n
            in l ++ [v] ++ r
+\end{lstlisting}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Binarno stablo}
+\begin{lstlisting}
 append :: TreeNode -> Int -> Node
 append EmptyNode x = Node EmptyNode EmptyNode x
 append n x = let v = value n
-                 r = right n
-                 l = left n
-             in if x < v then Node (append l x) r v else Node l (append r x) v
-
+                  r = right n
+                  l = left n
+              in if x < v 
+                then Node (append l x) r v 
+                else Node l (append r x) v
 
 fromlist :: [Int] -> TreeNode -> TreeNode
 fromlist [] n = n
 fromlist l n = let x = head l
-               in fromlist (tail l) (append n x)
+                in fromlist (tail l) (append n x)
 
 bstsort :: [Int] -> [Int]
 bstsort l = tolist (fromlist l EmptyNode)
 \end{lstlisting}
 \end{frame}
-
 
 
 \frame{
@@ -495,17 +516,21 @@ bstsort l = tolist (fromlist l EmptyNode)
 \begin{frame}[fragile]
 \frametitle{Primer * funkcije sa celim brojevima koje loguju operacije}
 \begin{lstlisting}
-data Debuggable = Debuggable (Int, [[Char]]) deriving (Show)
+data Debuggable = Debuggable (Int, [[Char]]) 
+    deriving (Show)
 
 
 ret :: Int -> Debuggable 
 ret x = Debuggable (x, [])
 
 bind :: Debuggable -> (Int -> Debuggable) -> Debuggable
-bind (Debuggable a b) f = Debuggable (y, z ++ b) where Debuggable (y,z) = f(a)
+bind (Debuggable a b) f = 
+    Debuggable (y, z ++ b) 
+    where Debuggable (y,z) = f(a)
 
 inc :: Int -> Debuggable  
-inc x = Debuggable (x+1, ["Number increased by one"])
+inc x = 
+  Debuggable (x+1, ["Number increased by one"])
 \end{lstlisting}
 \end{frame}
 
@@ -518,7 +543,9 @@ Debuggable (6,["Number increased by one"])
 *Main> bind (ret 5) inc 
 Debuggable (6,["Number increased by one"])
 *Main> bind (bind (ret 5) inc) inc
-Debuggable (7,["Number increased by one","Number increased by one"])
+Debuggable (7,["Number increased by one",
+  "Number increased by one"]
+)
 *Main> 
 \end{lstlisting}
 \end{frame}
@@ -535,10 +562,12 @@ Debuggable (7,["Number increased by one","Number increased by one"])
 \begin{frame}[fragile]
 \frametitle{Implementacija monade tako da možemo koristiti Haskellov sintaksni šećer}
 \begin{lstlisting}
-import Control.Applicative -- Otherwise you can't do the Applicative instance.
+import Control.Applicative 
 import Control.Monad (liftM, ap)
 
-data Debuggable a = Debuggable (a, [[Char]]) deriving (Show)
+data Debuggable a 
+    = Debuggable (a, [[Char]]) 
+    deriving (Show)
 -- needed since newer versions of GHC
 instance Functor Debuggable where
   fmap = liftM
@@ -550,10 +579,13 @@ instance Applicative Debuggable where
 
 instance Monad Debuggable where 
   return x = Debuggable (x, [])
-  (>>=) (Debuggable (a,b)) f = Debuggable (y, z ++ b) where Debuggable (y,z) = f(a)
+  (>>=) (Debuggable (a,b)) f = 
+    Debuggable (y, z ++ b) 
+    where Debuggable (y,z) = f(a)
 
 inc :: Int -> Debuggable Int
-inc x = Debuggable (x+1, ["Number increased by one"])
+inc x = 
+    Debuggable (x+1, ["Number increased by one"])
 \end{lstlisting}
 \end{frame}
 
@@ -562,7 +594,9 @@ inc x = Debuggable (x+1, ["Number increased by one"])
 \frametitle{Primer upotrebe return i bind funkcija}
 \begin{lstlisting}
 *Main> (inc 5) >>= (\x -> (return x) >>= inc)
-Debuggable (7,["Number increased by one","Number increased by one"])
+Debuggable (7,
+  ["Number increased by one","Number increased by one"]
+)
 *Main>
 \end{lstlisting}
 \end{frame}
@@ -581,7 +615,7 @@ inc2 num = do
 \begin{frame}[fragile]
 \frametitle{Unit monada}
 \begin{lstlisting}
-import Control.Applicative -- Otherwise you can't do the Applicative instance.
+import Control.Applicative 
 import Control.Monad (liftM, ap)
 
 data Unit a = Unit a deriving (Show)
@@ -602,7 +636,7 @@ instance Monad Unit where
 \begin{frame}[fragile]
 \frametitle{Maybe monada}
 \begin{lstlisting}
-import Control.Applicative -- Otherwise you can't do the Applicative instance.
+import Control.Applicative 
 import Control.Monad (liftM, ap)
 
 data Maybe a = Just a | Nothing
