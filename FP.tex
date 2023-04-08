@@ -18,40 +18,40 @@
 \frame{
 \frametitle{Uvod}
 \begin{itemize}
-\item LISP 1950te
-\item Deklarativni stil 
-\item Imutabilnost 
-\item Thread-safeness 
+  \item LISP 1950te
+  \item Deklarativni stil 
+  \item Imutabilnost 
+  \item Thread-safeness 
 \end{itemize}
 }
 
 \begin{frame}[fragile]
-\frametitle{Primer promene stanja u C}
-\begin{lstlisting}
+  \frametitle{Primer promene stanja u C}
+  \begin{lstlisting}
 #include <stdio.h>
 
 int f( int* x ) 
 {
-	int res = (*x) + 1;
-	(*x)++;
-	return res;
+  int res = (*x) + 1;
+  (*x)++;
+  return res;
 }
 
 int main() {
-	int x = 5;
-	printf("%d\n", f(&x));
-	printf("%d\n", f(&x));
-	return 0;
+  int x = 5;
+  printf("%d\n", f(&x));
+  printf("%d\n", f(&x));
+  return 0;
 }
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \frame{
 \begin{itemize}
-\item Funkcija f povećava x za jedan i vraća x+1
-\item f menja stanje od x
-\item Ako ne vidimo definiciju funkcije f, ne znamo šta ona zapravo radi sa vrednostima ulaznih parametara!
-\item Da li uvek možemo da tvrdimo da je f(x) == f(x)?
+  \item Funkcija f povećava x za jedan i vraća x+1
+  \item f menja stanje od x
+  \item Ako ne vidimo definiciju funkcije f, ne znamo šta ona zapravo radi sa vrednostima ulaznih parametara!
+  \item Da li uvek možemo da tvrdimo da je f(x) == f(x)?
 \end{itemize}
 }
 
@@ -59,285 +59,358 @@ int main() {
 \frametitle{Prednosti nemenjanja stanja promenljivih}
 
 \begin{itemize}
-\item Kompajler će ispisati grešku kada pokušamo promeniti stanje
-\item Svaka funkcija za iste ulazne parametre vraća istu povratnu vrednost
-\item Moguće lako paralelizovati program jer nema promene stanja promenljive 
+  \item Kompajler će ispisati grešku kada pokušamo promeniti stanje
+  \item Svaka funkcija za iste ulazne parametre vraća istu povratnu vrednost
+  \item Moguće lako paralelizovati program jer nema promene stanja promenljive 
 \end{itemize}
 }
 
 \frame{
 \frametitle{Data in - data out model} 
 \begin{itemize}
-\item Primenjivo nezavisno od jezika
-\item Svaka funkcija vraća neku vrednost 
-\item Za isti ulaz, funkcija uvek vraća isti izlaz
-\item Funkcija ne zavisi od globalnog okruženja (globalne promenljive, IO, ...)
-\item Funkcija ne modifikuje sopstveni ulaz 
-\item Moguće primeniti i u OOP kodu - svaki setter vraća novi objekat 
-\item Primer: lista
+  \item Primenjivo nezavisno od jezika
+  \item Svaka funkcija vraća neku vrednost 
+  \item Za isti ulaz, funkcija uvek vraća isti izlaz
+  \item Funkcija ne zavisi od globalnog okruženja (globalne promenljive, IO, ...)
+  \item Funkcija ne modifikuje sopstveni ulaz 
+  \item Moguće primeniti i u OOP kodu - svaki setter vraća novi objekat 
+  \item Primer: lista
 \end{itemize}
 }
 
 \begin{frame}[fragile]
-\frametitle{Lista u C}
-\begin{lstlisting}
+  \frametitle{Lista u C}
+  \begin{lstlisting}
 typedef struct ListElem_t
 {
-        int value;
-        struct ListElem_t* next;
+  int value;
+  struct ListElem_t* next;
 } ListElem;
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Konstruktor elementa liste}
-\begin{lstlisting}
+  \frametitle{Konstruktor elementa liste}
+  \begin{lstlisting}
 
 ListElem* create_element(int value, ListElem* next)
 {
-        ListElem* elem = (ListElem*) malloc(
-          sizeof(ListElem)
-        );
-        elem->value = value;
-        elem->next = next;
-        return elem;
+  ListElem* elem = (ListElem*) malloc(
+    sizeof(ListElem)
+  );
+  elem->value = value;
+  elem->next = next;
+  return elem;
 }
 
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Lista struktura}
-\begin{lstlisting}
+  \frametitle{Lista struktura}
+  \begin{lstlisting}
 
 typedef struct
 {
-        ListElem* head;
+  ListElem* head;
 } List;
 
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Konstruktor liste}
-\begin{lstlisting}
+  \frametitle{Konstruktor liste}
+  \begin{lstlisting}
 List* create_list(ListElem* head)
 {
-        List* l = (List*) malloc(sizeof(List));
-        l->head = head;
-        return l;
+  List* l = (List*) malloc(sizeof(List));
+  l->head = head;
+  return l;
 }
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Dodavanje elementa u listu}
-\begin{lstlisting}
+  \frametitle{Dodavanje elementa u listu}
+  \begin{lstlisting}
 List* push(List* l, int value)
 {
-        return create_list(create_element(
-		value, l->head
-	));
+  return create_list(create_element(
+    value, l->head
+  ));
 }
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Rep liste}
-\begin{lstlisting}
+  \frametitle{Rep liste}
+  \begin{lstlisting}
 List* tail(List* l)
 {
-        return create_list(l->head->next);
+  return create_list(l->head->next);
 }
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{print funkcija za ispis liste - zbog debug-a}
-\begin{lstlisting}
+  \frametitle{print funkcija za ispis liste - zbog debug-a}
+  \begin{lstlisting}
 void print(List* l)
 {
-        if (l->head == NULL) printf("\n");
-        else
-        {
-                printf("%d ", l->head->value);
-                print(tail(l));
-        }
+  if (l->head == NULL) printf("\n");
+  else
+  {
+    printf("%d ", l->head->value);
+    print(tail(l));
+  }
 }
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{main}
-\begin{lstlisting}
+  \frametitle{main}
+  \begin{lstlisting}
 int main() {
-        List *l = create_list(NULL);
-        push(l, 5);
-        print(l);
-        List* l2 = push(l, 5);
-        print(l2);
-
-        print(tail(l2));
-        print(push(l2, 10));
-        return 0;
+  List *l = create_list(NULL);
+  push(l, 5);
+  print(l);
+  List* l2 = push(l, 5);
+  print(l2);
+  
+  print(tail(l2));
+  print(push(l2, 10));
+  return 0;
 }
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \frame{
 \begin{itemize}
-\item Pure functional 
-\item Funkcije ne modifikuju parametre 
-\item Funkcije UVEK vraćaju rezultat
-\item Funkcija može primiti funkciju kao parametar
-\item Funkcija može vratiti funkciju kao rezultat
-\item Kompajlira se ali se može i interpretirati interaktivno
-\item ghc i ghci
-\item ".hs" ekstenzija se obično koristi za fajlove sa kodom
-\item Strogo tipovan - svaka vrednost mora imati svoj tip i jasno se zna šta je kog tipa tokom kompajliranja
+  \item Pure functional 
+  \item Funkcije ne modifikuju parametre 
+  \item Funkcije UVEK vraćaju rezultat
+  \item Funkcija može primiti funkciju kao parametar
+  \item Funkcija može vratiti funkciju kao rezultat
+  \item Kompajlira se ali se može i interpretirati interaktivno
+  \item ghc i ghci
+  \item ".hs" ekstenzija se obično koristi za fajlove sa kodom
+  \item Strogo tipovan - svaka vrednost mora imati svoj tip i jasno se zna šta je kog tipa tokom kompajliranja
 \end{itemize}
 }
 
 \begin{frame}[fragile]
-\frametitle{Primer funkcije koja računa kvadrat izlaza}
-\begin{lstlisting}
-sq :: Int -> Int
-sq x = x*x
-\end{lstlisting}
+  \frametitle{Primer funkcije koja računa kvadrat izraza}
+  \begin{lstlisting}
+    sq :: Int -> Int
+    sq x = x*x
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Primer upotrebe alata ghci}
-\begin{lstlisting}
-ghci example.hs 
->>> sq 5 
-25
->>>
-\end{lstlisting}
+  \frametitle{Primer upotrebe alata ghci}
+  \begin{lstlisting}
+    ghci example.hs 
+    >>> sq 5 
+    25
+    >>>
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Primer funkcije koja računa zbir ulaznih parametara}
-\begin{lstlisting}
+  \frametitle{Primer funkcije koja računa zbir ulaznih parametara}
+  \begin{lstlisting}
 add :: Int -> Int -> Int 
 add a b = a+b
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \frame{
 \begin{itemize}
-\item Funkcija u Haskell-u prima samo jedan parametar
-\item Funkcija `add` je funkcija koja prima jedan parametar i koja vraća funkciju koja prima drugi parametar i vraća zbir ta dva parametra
-\item inc = add 1 je funkcija koja vraća ulaz uvećan za jedan
+  \item Funkcija u Haskell-u prima samo jedan parametar
+  \item Funkcija `add` je funkcija koja prima jedan parametar i koja vraća funkciju koja prima drugi parametar i vraća zbir ta dva parametra
+  \item inc = add 1 je funkcija koja vraća ulaz uvećan za jedan
 \end{itemize}
 }
 
 \frame{
 \begin{itemize}
-\item Jednostruko-povezane liste
-\item l = [1,2,3]
-\item head l 
-\item tail l 
-\item reverse l 
-\item last l 
-\item l = l1 ++ l2
-\item 5 : l
-\item range = [1..5]
-\item range = [1, 1.01..5]
+  \item Jednostruko-povezane liste
+  \item l = [1,2,3]
+  \item head l 
+  \item tail l 
+  \item reverse l 
+  \item last l 
+  \item l = l1 ++ l2
+  \item 5 : l
+  \item range = [1..5]
+  \item range = [1, 1.01..5]
 \end{itemize}
 }
 
 
 \begin{frame}[fragile]
-\begin{lstlisting}
+  \begin{lstlisting}
 squares = [x*x | x <- [1..10]]
 
 squaresDiv3 = [x*x | x <- [1..10], 
-        x*x `mod` 3 == 0
-    ]
+  x*x `mod` 3 == 0
+]
 
 unitcircle = 
-    [(x,y) | 
-     x <- [0, 0.01..10], 
-     y <- [0,0.01..10], x*x + y*y < 1
-    ]
-\end{lstlisting}
+  [(x,y) | 
+    x <- [0, 0.01..10], 
+    y <- [0,0.01..10], x*x + y*y < 1
+  ]
+  \end{lstlisting}
 \end{frame}
 
 \frame{
 \frametitle{Pattern matching}
 \begin{itemize}
-\item Fukciju je moguće definisati specifično za neke ulazne parametre
-\item Neka vrsta zamene za "if" tako da kod izgleda lepo
-\item Može se koristiti za "otpakivanje" podataka u složenim tipovima kao što je lista
+  \item Fukciju je moguće definisati specifično za neke ulazne parametre
+  \item Neka vrsta zamene za "if" tako da kod izgleda lepo
+  \item Može se koristiti za "otpakivanje" podataka u složenim tipovima kao što je lista
 \end{itemize}
 }
 
 \begin{frame}[fragile]
-\frametitle{Faktorijel - primer pattern matching-a} 
-\begin{lstlisting}
+  \frametitle{Faktorijel - primer pattern matching-a} 
+  \begin{lstlisting}
 fact :: Int -> Int
 fact 0 = 1
 fact n = n * (fact (n-1))
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Funkcija koja vraća jedinicu ako je bar jedan ulaz jednak nuli}
-\begin{lstlisting}
+  \frametitle{Funkcija koja vraća jedinicu ako je bar jedan ulaz jednak nuli}
+  \begin{lstlisting}
 anyzero :: Int -> Int -> Int
 anyzero 0 x = 1
 anyzero x 0 = 1
 anyzero x y = 0
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Neke funkcije koje rade sa listama}
-\begin{lstlisting}
+  \frametitle{Neke funkcije koje rade sa listama}
+  \begin{lstlisting}
 
 mymap :: (a -> b) -> [a] -> [b]
 mymap _ [] = []
 mymap f (x:xs) = (f x) : (mymap f xs)
 
-
-reduce :: (b -> a -> b) -> b -> [a] -> b 
-reduce _ z [] = z 
-reduce f z (x:xs) = reduce f (f z x) xs
-
 myfilter :: (a -> Bool) -> [a] -> [a]
 myfilter _ [] = [] 
 myfilter f (x:xs) = 
   if (f x) then x : (myfilter f xs) 
-	else myfilter f xs
+  else myfilter f xs
 
-*Main> mymap (+ 1) [1,2,3]
-[2,3,4]
-*Main> filter (\x -> x `mod` 2 == 0) [1,2,3,4,5,6]
-[2,4,6]
-*Main> reduce (+) 0 [1,2,3,4,5]
-15
-*Main> 
-
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Funkcija koja vraća listu gde dva ista elementa nisu jedan do drugog} 
-\begin{lstlisting}
+  \frametitle{Upotreba}
+  \begin{lstlisting}
+  *Main> mymap (+ 1) [1,2,3]
+  [2,3,4]
+  *Main> myfilter (\x -> x `mod` 2 == 0) [1,2,3,4,5,6]
+  [2,4,6]
+
+  \end{lstlisting}
+\end{frame}
+    
+
+\begin{frame}
+  \frametitle{fold}
+  \begin{itemize}
+    \item krenemo od funkcije sum pa ćemo da je generalizujemo
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Obična suma brojeva}
+  \begin{lstlisting}
+sum :: [Int] -> Int
+sum [] = 0
+sum [x:xs] = x + (sum xs)
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Obična suma brojeva - ali sada imamo drugačiji neutralni element!}
+  \begin{lstlisting}
+sum :: Int -> [Int] -> Int
+sum z []  = z
+sum z [x:xs] = x + (sum z xs )
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Zamenimo + sa generalnom funkcijom f}
+  \begin{lstlisting}
+sum :: (Int -> Int -> Int) -> Int -> [Int] -> Int
+sum f z []  = z
+sum f z [x:xs] = f x  (sum f z xs )
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{E al sad nam ne treba više Int, sad može šta hoćemo!}
+  \begin{lstlisting}
+reduce :: (a -> b -> b) -> b -> [a] -> b
+reduce f z []  = z
+reduce f z [x:xs] = f x  (sum f z xs )
+  \end{lstlisting}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Ilustracija fold-a}
+  \includegraphics[width=\textwidth]{png/foldl.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ilustracija desnog fold-a}
+  \includegraphics[width=\textwidth]{png/foldr.png}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Upotreba}
+  \begin{lstlisting}
+*Main> reduce (+) 0 [1,2,3,4,5]
+15
+*Main> 
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Funkcija koja vraća listu gde dva ista elementa nisu jedan do drugog} 
+  \begin{lstlisting}
 
 norepeat :: (Eq a) => [a] -> [a]
 norepeat [] = [] 
 norepeat (x:[]) = [x]
 norepeat (x:y:xs) = if x == y 
-   then norepeat (x:xs) 
-   else x:(norepeat (y:xs))
+then norepeat (x:xs) 
+else x:(norepeat (y:xs))
+
+  \end{lstlisting}
+\end{frame}
+    
+
+\begin{frame}[fragile]
+  \frametitle{Upotreba}
+  \begin{lstlisting}
 
 *Main> norepeat [1,1,2,5,5,6]
 [1,2,5,6]
@@ -349,451 +422,172 @@ norepeat (x:y:xs) = if x == y
 [1,2,5]
 *Main>
 
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Quick sort}
-\begin{lstlisting}
+  \frametitle{Quick sort}
+  \begin{lstlisting}
 qsort :: [Int] -> [Int]
 qsort [] = []
-qsort l = (qsort [x | x<-l, x < y]) ++ [y] 
-    ++ (qsort [x | x<-l, x>y]) where y = (head l)
-\end{lstlisting}
+qsort l = 
+  (qsort [x | x<-l, x < y]) 
+  ++ [y] 
+  ++ (qsort [x | x<-l, x>y]) where y = (head l)
+  \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Razdvajanje stringa u listu reči}
-\begin{lstlisting}
-findFirstWord :: [Char] -> ([Char], [Char])
-findFirstWord "" = ("", "")
-findFirstWord " " = ("", "")
-findFirstWord s =
-  let 
-    (remaining, others) = findFirstWord $ tail s
-        x = head s
-    in if x == ' ' then ("", tail s) 
-       else (x : remaining, others)
-
-split :: [Char] -> [[Char]]
-split "" = []
-split s = let (x, y) = findFirstWord s
-          in [x] ++ (split y)
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Funkcija koja vraća dužinu stringa}
-\begin{lstlisting}
-strlen :: String -> Int
-strlen s
-    | s == "" = 0
-    | otherwise = 1 + (strlen $ tail s)
-\end{lstlisting}
-\end{frame}
-
+    
 
 \frame{
 \frametitle{Tipovi podataka}
 \begin{itemize}
-\item Definišu se tako što se navede ime tipa i njegovi konstruktori
-\item data NoviTip = konstruktor1 | konstruktor2 | ... 
-\item data Shape = Rectangle Int Int | Circle Int | Square Int 
+  \item Definišu se tako što se navede ime tipa i njegovi konstruktori
+  \item data NoviTip = konstruktor1 | konstruktor2 | ... 
+  \item data Shape = Rectangle Int Int | Circle Int | Square Int 
 \end{itemize}
 }
 
 \begin{frame}[fragile]
-\frametitle{Primer funkcije nad tipom}
-\begin{lstlisting}
+  \frametitle{Primer funkcije nad tipom}
+  \begin{lstlisting}
 data Shape = Circle Float | Rectangle Float Float 
 area :: Shape -> Float 
 area (Circle r) = r*r*3.14
 area (Rectangle a b) = a*b
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
-
-
+    
 \begin{frame}[fragile]
-\frametitle{Primer - Zipper}
-\begin{lstlisting}
-data Zipper a = Zip [a] a [a] deriving (Show)
-
-right :: Zipper a -> Zipper a
-right (Zip l focus []) = Zip l focus [] 
-right (Zip l focus r) = 
-    Zip (focus:l) (head r ) (tail r)
-
-
-left :: Zipper a -> Zipper a
-left (Zip [] focus r) = Zip [] focus r
-left (Zip l focus r) = 
-    Zip (tail l) (head l) (focus:r)
-
-\end{lstlisting}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\begin{lstlisting}
-*Main> z = Zip [3, 2, 1] 4 [5, 6, 7]
-*Main> right z 
-Zip [4,3,2,1] 5 [6,7]
-*Main> left $ right z 
-Zip [3,2,1] 4 [5,6,7]
-*Main> left $ left $ right z 
-Zip [2,1] 3 [4,5,6,7]
-*Main> left $ left $ left $ right z 
-Zip [1] 2 [3,4,5,6,7]
-*Main> left $ left $ left $ left $ right z 
-Zip [] 1 [2,3,4,5,6,7]
-*Main> left $ left $ left $ left $ left $ right z 
-Zip [] 1 [2,3,4,5,6,7]
-*Main> 
-\end{lstlisting}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Binarno stablo}
-\begin{lstlisting}
+  \frametitle{Binarno stablo}
+  \begin{lstlisting}
 data TreeNode = Node {
-        left :: Node,
-        right :: Node,
-        value :: Int
-    } | EmptyNode
+left :: Node,
+right :: Node,
+value :: Int
+} | EmptyNode
 
 tolist :: TreeNode -> [Int]
 tolist EmptyNode = []
 tolist n = let l = tolist $ left n
-               r = tolist $ right n
-               v = value n
-           in l ++ [v] ++ r
-\end{lstlisting}
+  r = tolist $ right n
+  v = value n
+  in l ++ [v] ++ r
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Binarno stablo}
-\begin{lstlisting}
-append :: TreeNode -> Int -> Node
+  \frametitle{Binarno stablo}
+  \begin{lstlisting}
+append :: TreeNode -> Int -> TreeNode
 append EmptyNode x = Node EmptyNode EmptyNode x
 append n x = let v = value n
-                  r = right n
-                  l = left n
-              in if x < v 
-                then Node (append l x) r v 
-                else Node l (append r x) v
+  r = right n
+  l = left n
+  in if x < v 
+  then Node (append l x) r v 
+  else Node l (append r x) v
 
 fromlist :: [Int] -> TreeNode -> TreeNode
 fromlist [] n = n
 fromlist l n = let x = head l
-                in fromlist (tail l) (append n x)
+  in fromlist (tail l) (append n x)
 
 bstsort :: [Int] -> [Int]
 bstsort l = tolist (fromlist l EmptyNode)
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
 
 \frame{
 \frametitle{Monade}
 \begin{itemize}
-\item Način da se promeni stanje 
-\item U realnom svetu, pojavljuje se potreba za moguč=ćnošću da se stanje može promeniti
-\item Primer: IO
-\item Monada uokviruje postojeći tip sa dodatnim informacijama koje se provlače kroz izračunavanje. 
-\item Potrebno implementirati:
-\begin{itemize}
-\item Tip podataka 
-\item return funkciju - a - > m a 
-\item bind funkciju - m a -> (a -> m a) -> m a
-\end{itemize}
-\item return ne utiče na izračunavanje 
-\item bind vezuje dva izračunavanja - poput kompozicije
-\end{itemize}
-}
-
-\begin{frame}[fragile]
-\frametitle{Primer * funkcije sa celim brojevima koje loguju operacije}
-\begin{lstlisting}
-data Debuggable = Debuggable (Int, [[Char]]) 
-    deriving (Show)
-
-
-ret :: Int -> Debuggable 
-ret x = Debuggable (x, [])
-
-bind :: Debuggable -> (Int -> Debuggable) -> Debuggable
-bind (Debuggable a b) f = 
-    Debuggable (y, z ++ b) 
-    where Debuggable (y,z) = f(a)
-
-inc :: Int -> Debuggable  
-inc x = 
-  Debuggable (x+1, ["Number increased by one"])
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\begin{lstlisting}
-*Main> ret 5 
-Debuggable (5,[])
-*Main> inc 5 
-Debuggable (6,["Number increased by one"])
-*Main> bind (ret 5) inc 
-Debuggable (6,["Number increased by one"])
-*Main> bind (bind (ret 5) inc) inc
-Debuggable (7,["Number increased by one",
-  "Number increased by one"]
-)
-*Main> 
-\end{lstlisting}
-\end{frame}
-
-
-\frame{
-\begin{itemize}
-\item Haskell ima sintaksni šećer za monade 
-\item pomoću do-bloka je moguće pisati kod koji liči na kod u imperativnim jezicima 
-\item Potrebno implementirati monade tako da ih Haskell prepozna kao takve 
+  \item Način da se promeni stanje 
+  \item U realnom svetu, pojavljuje se potreba za moguč=ćnošću da se stanje može promeniti
+  \item Primer: IO
+  \item Monada uokviruje postojeći tip sa dodatnim informacijama koje se provlače kroz izračunavanje. 
+  \item Potrebno implementirati:
+  \begin{itemize}
+    \item Tip podataka 
+    \item return funkciju - a - > m a 
+    \item bind funkciju - m a -> (a -> m a) -> m a
+  \end{itemize}
+  \item return ne utiče na izračunavanje 
+  \item bind vezuje dva izračunavanja - poput kompozicije
 \end{itemize}
 }
 
 \begin{frame}[fragile]
-\frametitle{Implementacija monade tako da možemo koristiti Haskellov sintaksni šećer}
-\begin{lstlisting}
-import Control.Applicative 
-import Control.Monad (liftM, ap)
-
-data Debuggable a 
-    = Debuggable (a, [[Char]]) 
-    deriving (Show)
--- needed since newer versions of GHC
-instance Functor Debuggable where
-  fmap = liftM
-
-instance Applicative Debuggable where
-  pure  = return
-  (<*>) = ap
-------------------------
-
-instance Monad Debuggable where 
-  return x = Debuggable (x, [])
-  (>>=) (Debuggable (a,b)) f = 
-    Debuggable (y, z ++ b) 
-    where Debuggable (y,z) = f(a)
-
-inc :: Int -> Debuggable Int
-inc x = 
-    Debuggable (x+1, ["Number increased by one"])
-\end{lstlisting}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Primer upotrebe return i bind funkcija}
-\begin{lstlisting}
-*Main> (inc 5) >>= (\x -> (return x) >>= inc)
-Debuggable (7,
-  ["Number increased by one","Number increased by one"]
-)
-*Main>
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{do-blokovi}
-\begin{lstlisting}
-inc2 :: Int -> Debuggable Int 
-inc2 num = do 
-  x <- inc num
-  y <- inc x 
-  return y 
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Unit monada}
-\begin{lstlisting}
-import Control.Applicative 
-import Control.Monad (liftM, ap)
+  \frametitle{Unit monada}
+  \begin{lstlisting}
 
 data Unit a = Unit a deriving (Show)
 
-instance Functor Unit where
-  fmap = liftM
-
-instance Applicative Unit where
-  pure  = return
-  (<*>) = ap
-
 instance Monad Unit where 
-  return x = Unit x
-  (>>=) (Unit x) f = f x
-\end{lstlisting}
+return x = Unit x
+(>>=) (Unit x) f = f x
+  \end{lstlisting}
 \end{frame}
-
+  
 \begin{frame}[fragile]
-\frametitle{Maybe monada}
-\begin{lstlisting}
-import Control.Applicative 
-import Control.Monad (liftM, ap)
-
+  \frametitle{Maybe monada}
+  \begin{lstlisting}
 data Maybe a = Just a | Nothing
 
-instance Functor Maybe where
-  fmap = liftM
-
-instance Applicative Maybe where
-  pure  = return
-  (<*>) = ap
-
 instance Monad Maybe where 
-  return x = Just x
-  (>>=) (Nothing) _ = Nothing
-  (>>=) (Just x) f = f x
-\end{lstlisting}
+return x = Just x
+(>>=) (Nothing) _ = Nothing
+(>>=) (Just x) f = f x
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{IO monada - hello world}
-\begin{lstlisting}
+  \frametitle{IO monada - hello world}
+  \begin{lstlisting}
 main :: IO ()
 main = putStrLn "Hello world!" 
 
 ghc hello.hs -o hello -dynamic 
 
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
-
-\begin{frame}[fragile]
-\frametitle{Unos podataka preko stadardnog ulaza}
-\begin{lstlisting}
-main :: IO ()
-main = do
-  putStrLn "Enter your name"
-  name <- getLine
-  putStrLn $ "Your name is " ++ name
-\end{lstlisting}
-\end{frame}
-
+  
 \frame{
-\frametitle{WTF?????}
-\begin{itemize}
-\item IO monada je hak 
-\item IO moada je izlaz u realni svet 
-\item IO monada čuva redni broj tako da funkcije se ne optimizuju od strane kompajlera već se uvek izvršavaju!
-\end{itemize}
+  \frametitle{WTF?????}
+  \begin{itemize}
+    \item IO monada je hak 
+    \item IO moada je izlaz u realni svet 
+    \item IO monada čuva redni broj tako da funkcije se ne optimizuju od strane kompajlera već se uvek izvršavaju!
+  \end{itemize}
 }
 
-
 \begin{frame}[fragile]
-\frametitle{Naš printStrLn} 
-\begin{lstlisting}
+  \frametitle{State}
+  \begin{lstlisting}
+data State s a = State (s -> (a,s))  
 
-{-# LANGUAGE ForeignFunctionInterface #-}
+instance Monad (State s) where 
+    return x = State $ \s -> (x,s)  
+    (State h) >>= f = 
+      State $ \s -> let (a, newState) = h s  
+                  (State g) = f a  
+                  in  g newState  
 
-import Foreign.C.String
-import Foreign.C.Types 
-
-foreign import ccall safe "prototypes.h my_print_line"
-    cMyPrintLine :: CString -> IO ()
-
-myPrintLine :: String -> IO () 
-myPrintLine str = do 
-    c_str <- newCString str
-    cMyPrintLine c_str
-
-
-
-main = do 
-    myPrintLine "hello!"
-
-
-\end{lstlisting}
+  \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{C kod}
-\begin{lstlisting}
+\begin{frame}
+  \frametitle{Zaključak}
+  \begin{itemize}
+    \item Deklarativni stil
+    \item Ne mora Haskell - principi primenljivi na druge jezike!
+    \item Manje bagova 
+    \item Lakše testirati softver
+  \end{itemize}
 
-#include <stdio.h>
-#include "functions.h"
+  
 
-
-void my_print_line(char* str) 
-{
-	printf("%s\n", str);
-}
-
-
-\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{header}
-\begin{lstlisting}
-extern int my_rand();
-extern void my_print_line(char*);
-\end{lstlisting}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Implementacija rand funkcije}
-\begin{lstlisting}
-
-#include <stdlib.h>
-#include <time.h>
-
-int my_rand() 
-{
-	time_t t; 
-	srand((unsigned) time(&t));
-	return 1 + rand() % 5;
-}
-
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\begin{lstlisting}
-foreign import ccall safe "prototypes.h my_rand"
-    cMyRand :: IO CInt
-
-myRand :: IO Int
-myRand = do
-    r <- cMyRand
-    return ((fromInteger . toInteger) r)
-
-
-guessToStr :: Int -> String
-guessToStr 1 = "1"
-guessToStr 2 = "2"
-guessToStr 3 = "3"
-guessToStr 4 = "4"
-guessToStr 5 = "5"
-guessToStr 6 = "6"
-
-
-main = do
-    myPrintLine "hello!"
-    myPrintLine "hello!"
-    r1 <- myRand
-    r2 <- myRand
-    myPrintLine $ guessToStr r1
-    myPrintLine $ guessToStr r2
-
-\end{lstlisting}
-\end{frame}
-
-\frame{
-\frametitle{Zadaci}
-\begin{itemize}
-\item JSON parser 
-\item Parsiranje izraza (5+2, (3+2)*5, 5*2 - 1, ...)
-\item Web server sa REST API-em koji komunicira sa bazom
-\end{itemize}
-}
 \end{document}
