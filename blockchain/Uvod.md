@@ -7,9 +7,19 @@ marp: true
 Stefan Nožinić (stefan@lugons.org)
 
 ---
-# Osnovni koncepti 
+# Motivacija
 
+![bg contain](./diagrams/10.png)
 
+---
+# P2P mreža 
+
+![](./diagrams/1.png)
+
+---
+# RPC 
+
+![bg contain](./diagrams/11.png)
 
 ---
 # Asimetrična kriptografija 
@@ -29,6 +39,45 @@ Stefan Nožinić (stefan@lugons.org)
 ---
 
 ![bg contain](./diagrams/8.png)
+
+---
+# Konsenzus 
+
+![](./diagrams/2.png)
+
+
+
+---
+# Byzantine Fault Tolerance
+
+![](./diagrams/3.png)
+
+
+
+
+---
+# Double spending
+
+Pošaljilac | Primalac | Vrednost | Kusur
+------|-----------|-------|-------
+A     | B        | $100   | $400
+A     | B        | $600   | $1000
+
+---
+# Sybill attack 
+
+
+![](./diagrams/4.png)
+
+---
+# HashCash 
+
+--- 
+# Proof of work 
+
+
+
+
 
 ---
 # Append-only log 
@@ -81,11 +130,6 @@ C     | $1300
 
 
 ---
-# Bilasni ledger
-
-* sadrži listu bilansa stanja 
-
----
 # Transakcijski ledger
 
 Pošaljilac | Primalac | Vrednost | Kusur
@@ -95,38 +139,6 @@ B     | C        | $100   | $1000
 C     | A        | $100   | $0
 
 
----
-# P2P mreža 
-
-![](./diagrams/1.png)
-
----
-# Double spending
-
-Pošaljilac | Primalac | Vrednost | Kusur
-------|-----------|-------|-------
-A     | B        | $100   | $400
-A     | B        | $600   | $1000
-
-
----
-# Konsenzus 
-
-![](./diagrams/2.png)
-
-
-
----
-# Byzantine Fault Tolerance
-
-![](./diagrams/3.png)
-
-
----
-# Sybill attack 
-
-
-![](./diagrams/4.png)
 
 
 
@@ -135,15 +147,17 @@ A     | B        | $600   | $1000
 
 ![](./diagrams/5.png)
 
+
+
+
+
 ---
-# Konsenzus u prisustvu malicioznih procesa
+# Coinbase
 
-* Proof of work 
-* Proof of stake 
-* Proof of authority 
-* Proof of burn
-* ...
+* zašto bi neko validirao blokove ako može da se osloni na druge čvorove da rade težak posao?
 
+---
+![bg contain](./diagrams/9.png)
 
 ---
 # Čvorovi u mreži
@@ -155,15 +169,21 @@ A     | B        | $600   | $1000
 * mining pool operators - full node that uses other miners and redistributes reward
 * wallets - creates key pairs, store its transactions, view its transactions, send transactions and receive transactions to itself
 * mempool - keeps track of unconfirmed but validated transactions
+---
+# Konsenzus u prisustvu malicioznih procesa
+
+* Proof of work 
+* Proof of stake 
+* Proof of authority 
+* Proof of burn
+* ...
 
 
 ---
-# Coinbase
-
-* zašto bi neko validirao blokove ako može da se osloni na druge čvorove da rade težak posao?
+# Bitcoin 
 
 ---
-![bg contain](./diagrams/9.png)
+# bitCoin analiza 
 
 
 ---
