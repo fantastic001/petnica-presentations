@@ -7,7 +7,6 @@ marp: true
 Stefan Nožinić (stefan@lugons.org)
 
 ---
-# Motivacija
 
 ![bg contain](./diagrams/10.png)
 
@@ -41,6 +40,16 @@ Stefan Nožinić (stefan@lugons.org)
 ![bg contain](./diagrams/8.png)
 
 ---
+# Append-only log 
+
+Vreme  | Autor | Podaci
+-------|-------|------
+15616  |A      | ....
+28615  |B      | ....
+30160  |C      | ....
+
+
+---
 # Konsenzus 
 
 ![](./diagrams/2.png)
@@ -64,7 +73,7 @@ A     | B        | $100   | $400
 A     | B        | $600   | $1000
 
 ---
-# Sybill attack 
+# Sybil attack 
 
 
 ![](./diagrams/4.png)
@@ -74,20 +83,6 @@ A     | B        | $600   | $1000
 
 --- 
 # Proof of work 
-
-
-
-
-
----
-# Append-only log 
-
-Vreme  | Autor | Podaci
--------|-------|------
-15616  |A      | ....
-28615  |B      | ....
-30160  |C      | ....
-
 
 ---
 # Transakcija 
@@ -152,7 +147,7 @@ C     | A        | $100   | $0
 
 
 ---
-# Coinbase
+# Motivacija za PoW
 
 * zašto bi neko validirao blokove ako može da se osloni na druge čvorove da rade težak posao?
 
@@ -162,13 +157,13 @@ C     | A        | $100   | $0
 ---
 # Čvorovi u mreži
 
-* full nodes - stores whole blockchain, transactions, and is able to validate all transactions
-* pruning nodes - prune some transactions after validation (block created) and aging
-* lightweight nodes - store blockchain headers only
-* miners - create new blocks and perform proof of work / stake / …
-* mining pool operators - full node that uses other miners and redistributes reward
-* wallets - creates key pairs, store its transactions, view its transactions, send transactions and receive transactions to itself
-* mempool - keeps track of unconfirmed but validated transactions
+* full nodes
+* pruning nodes 
+* lightweight nodes 
+* miner nodes
+* mining pool operators 
+* wallets 
+* mempool
 ---
 # Konsenzus u prisustvu malicioznih procesa
 
@@ -182,9 +177,10 @@ C     | A        | $100   | $0
 ---
 # Bitcoin 
 
----
-# bitCoin analiza 
-
+* Proof of work 
+* P2P - gossip protocol
+* Transakcije mogu da sadrže posebne skript delove
+* merkle stabla
 
 ---
 # Pitanja?
