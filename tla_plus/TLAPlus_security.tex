@@ -4,7 +4,7 @@
 \usepackage{graphicx}
 \usepackage{multicol}
 \usepackage{listings}
-
+\usepackage{pdfpages}
 
 
 \begin{document}
@@ -51,4 +51,169 @@ int main() {
     \end{center}
 
 \end{frame}
+
+
+\begin{frame}[fragile]
+    \includegraphics[width=\textwidth]{./sm_increment.png}
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \LARGE{\textbf{Two-phase commit}}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+---- MODULE twoPhase ----
+EXTENDS TLC
+
+CONSTANT RM 
+VARIABLE rmState 
+VARIABLES tmState, tmPrepared, msgs 
+
+Messages == [type : {"prepared"}, rm : RM] \cup 
+    [type : {"commit", "abort"}]
+
+
+
+TPTypeOK == 
+    /\ rmState \in [RM -> {"working", "prepared", 
+        "committed", "aborted"}]
+    /\ tmState \in {"init", "done"}
+    /\ tmPrepared \subseteq RM
+    /\ msgs \subseteq Messages
+
+
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+TPInit == 
+    /\ rmState = [r \in RM |-> "working"]
+    /\ tmState = "init"
+    /\ tmPrepared = {}
+    /\ msgs = {}
+
+    \end{lstlisting}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+
+TPNext ==
+    \/ TMAbort
+    \/ TMCommit
+    \/ (\E r \in RM : RMPrepare(r))
+    \/ (\E r \in RM : RMChoosetoAbort(r))
+    \/ (\E r \in RM : TPRecvPrepared(r))
+    \/ (\E r \in RM : RMChooseToCommit(r))
+    \/ \E r \in RM : RMAbort(r)
+
+
+
+====
+    \end{lstlisting}
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+
+
+
+TPRecvPrepared(r) == 
+    /\ tmState = "init"
+    /\ [type |-> "prepared", rm |-> r] \in msgs
+    /\ tmPrepared' = tmPrepared \cup {r}
+    /\ UNCHANGED << tmState, msgs, rmState >>
+        
+    \end{lstlisting}
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+TMCommit == 
+    /\ tmState = "init"
+    /\ \A r \in RM : r \in tmPrepared
+    /\ msgs' = msgs \cup {[type |-> "commit"]}
+    /\ tmState' = "done"
+    /\ UNCHANGED <<rmState, tmPrepared >> 
+    
+TMAbort ==
+    /\ tmState = "init"
+    /\ tmState' = "done"
+    /\ \E r \in RM : rmState[r] = "aborted"
+    /\ msgs' = msgs \cup {[type |-> "abort"]}
+    /\ tmPrepared' = {} 
+    /\ UNCHANGED  <<rmState>>
+
+
+    \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+RMPrepare(r) == 
+    /\ rmState[r] = "working"
+    /\ msgs' = msgs \cup 
+        {[rm |-> r, type |-> "prepared"]}
+    /\ rmState' = [rmState 
+        EXCEPT ![r] = "prepared"]
+    /\ UNCHANGED <<tmPrepared, tmState>>
+
+RMAbort(r) == 
+    /\ rmState[r] = "working"
+    /\ rmState' = [rmState 
+        EXCEPT ![r] = "aborted"]
+    /\ UNCHANGED 
+        <<tmPrepared, tmState, msgs>>
+
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+RMChoosetoAbort(r) == 
+    /\ rmState[r] = "working"
+    /\ [type |-> "abort"] \in msgs 
+    /\ rmState' = [rmState 
+        EXCEPT  ![r] = "aborted"]
+    /\ UNCHANGED  
+        <<tmState, tmPrepared, msgs>>
+
+
+    \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{lstlisting}
+RMChooseToCommit(r) == 
+    /\ rmState[r] = "working"
+    /\ [type |-> "commit"] \in msgs 
+    /\ rmState' = [rmState 
+        EXCEPT  ![r] = "committed"]
+    /\ UNCHANGED  
+        <<tmState, tmPrepared, msgs>>
+
+
+
+
+====
+    \end{lstlisting}
+
+
+\end{frame}
+
+
+
 \end{document}
