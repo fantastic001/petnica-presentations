@@ -1,0 +1,54 @@
+\documentclass{beamer} 
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{listings}
+
+
+
+\begin{document}
+
+\title{Using formalism to design secure systems}
+\author{Stefan Nožinić (stefan@lugons.org)}
+
+\frame{
+\titlepage
+}
+
+% https://pdfs.semanticscholar.org/5b26/c71affdd6db82e58344510512d6a2c9f070a.pdf
+% https://etd.ohiolink.edu/apexprod/rws_etd/send_file/send?accession=ucin1623169331790079&disposition=inline
+% https://www.dsn.kastel.kit.edu/publications/2022-PCN-TLA+.pdf
+% https://users.cs.northwestern.edu/~ychen/Papers/Narayana-wimax.pdf
+\begin{frame}
+    \frametitle{Agenda}
+    \begin{itemize}
+        \item What are formal methods
+        \item How to formalize systems 
+        \item Several examples from literature 
+        \item Security issue detection using model checker
+        \item Conclusion
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\begin{lstlisting}[language=C++]
+
+int main() {
+    int i = readInteger();
+    i++;
+    return 0;
+}
+
+	\end{lstlisting}
+	
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \LARGE{\textbf{How to model this simple program formally as state machine?}}
+    \end{center}
+
+\end{frame}
+\end{document}
