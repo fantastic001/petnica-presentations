@@ -26,7 +26,7 @@
         \item What are formal methods
         \item How to formalize systems 
         \item Several examples from literature 
-        \item Security issue detection using model checker
+        \item One real world example
         \item Conclusion
     \end{itemize}
 
@@ -214,6 +214,44 @@ RMChooseToCommit(r) ==
 
 \end{frame}
 
+\begin{frame}
+    \frametitle{PlusCal}
+    \begin{itemize}
+        \item A little more progreammer-friendly 
+        \item We specify processes and TLC will check all behaviours
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Simple clock}
+    \begin{itemize}
+        \item We start from anywhere between 1 and 12 (including 1 and 12)
+        \item in every iteration, we increase by one 
+        \item when we reach 12, we reset back to 1 
+        \item We also state that "x will be eventually one"
+    \end{itemize}
+\end{frame}
 
 
+
+\begin{frame}[fragile]
+    \frametitle{Real world example - health monitor}
+    \begin{itemize}
+        \item We have several nodes (lets say nodes are 1, 2 and 3)
+        \item Every node can reboot and recover later on 
+        \item Every node has one instance of service called "replicator"
+        \item When node is down, its replicator instance gets transferred to another node which is up 
+        \item When we detect that replicato instance is stuck, we kill it and restart it 
+        \item We state that eventually if replicator is stuck, this will lead to either it being killed or recovered by itself
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \includegraphics[width=0.9\textwidth, height=0.9\textheight]{examples/img1.png}
+\end{frame}
+
+
+\begin{frame}
+    \includegraphics[width=0.9\textwidth, height=0.9\textheight]{examples/img2.png}
+\end{frame}
 \end{document}
