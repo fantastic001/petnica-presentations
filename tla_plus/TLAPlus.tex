@@ -111,17 +111,29 @@ void processRequest() {
 void main() {
     int i = getValue(); // start
     i++; // middle
-    setValue(i); // end
+    setValue(i); // done
 }
 
 	\end{lstlisting}
 	
 \end{frame}
 
+\begin{frame}
+    \frametitle{TLA+}
+    \begin{itemize}
+        \item Essentially we specify state machine and its properties 
+        \begin{itemize}
+            \item State variables
+            \item What are valid initial states 
+            \item What are valid next states, given current state 
+            \item Properties
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]
     \includegraphics[width=\textwidth]{./sm_increment.png}
 \end{frame}
-
 
 \begin{frame}
     \frametitle{PlusCal}
