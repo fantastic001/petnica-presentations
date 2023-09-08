@@ -149,11 +149,19 @@ void main() {
     \begin{itemize}
         \item We have several nodes (lets say nodes are 1, 2 and 3)
         \item Every node can reboot and recover later on 
-        \item Every node has one instance of service called "replicator"
-        \item When node is down, its replicator instance gets transferred to another node which is up 
-        \item When we detect that replicato instance is stuck, we kill it and restart it 
-        \item We state that eventually if replicator is stuck, this will lead to either it being killed or recovered by itself
+        \item Every node has one instance of service 
+        \item When node is down, its service instance gets transferred to another node which is up to serve additional traffic
+        \item When we detect that service instance is stuck, we kill it and restart it 
+        \item We state that eventually if service is stuck, this will lead to either it being killed or recovered by itself
     \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \begin{center}
+        \LARGE{\textbf{Demo}}
+    \end{center}
+
 \end{frame}
 
 \begin{frame}
