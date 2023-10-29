@@ -1,0 +1,9 @@
+**.old
+**.out
+**/states/
+**.aux 
+**.log
+**.dvi 
+**.fdb_latexmk
+**.fls
+**.gz 

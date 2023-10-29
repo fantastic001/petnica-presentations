@@ -1,0 +1,9 @@
+\frametitle{Real world example - health monitor}
+    \begin{itemize}
+        \item We have several nodes (lets say nodes are 1, 2 and 3)
+        \item Every node can reboot and recover later on
+        \item Every node has one instance of service
+        \item When node is down, its service instance gets transferred to another node which is up to serve additional traffic
+        \item When we detect that service instance is stuck, we kill it and restart it
+        \item We state that eventually if service is stuck, this will lead to either it being killed or recovered by itself
+    \end{itemize}
