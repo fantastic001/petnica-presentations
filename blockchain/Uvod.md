@@ -1,5 +1,6 @@
 ---
 marp: true
+math: mathjax
 ---
 
 # BlockChain - Uvodno predavanje 
@@ -11,6 +12,15 @@ Stefan Nožinić (stefan@lugons.org)
 ![bg contain](./diagrams/10.png)
 
 ---
+# Potrebni primitivi 
+
+* P2P mreža 
+* content addressability 
+* Autentičnost poruke (potpis)
+* sprečavanje raznih napada 
+* konsenzus
+
+---
 # P2P mreža 
 
 ![](./diagrams/1.png)
@@ -19,6 +29,50 @@ Stefan Nožinić (stefan@lugons.org)
 # RPC 
 
 ![bg contain](./diagrams/11.png)
+
+
+
+
+---
+# Content addressability
+
+
+---
+# Heš funkcije 
+
+Osobine heš funkcije H : S -> B gde je B skup nizova fiksne dužine.
+
++ ulaz može biti bilo koje veličine
++ izlaz je fiksne veličine
++ računanje H(x) je računarski lako i u polinomijalnom vremenu u odnosu na veličinu ulaza
++ za bilo koje h u M, računarski je neizvodljivo izračunati x takvo da H(x) = h
++ za bilo koji blok x, računarski je teško pronaći y != x takvo da H(x) = H(y)
++ računarski je teško pronaći bilo koji par (x,y) takav da H(x) = H(y)
+
+---
+
+osobina 6 štiti od birthday attack-a
+
+ako H zadovoljava prvih 5 osobina, naziva se slabom heš funkcijom
+
+ako zadovoljava svih 6 osobina, naziva se jakom heš funkcijom.
+
+---
+#  SHA-512 algoritam
+
+```
+function sha512(m):
+    old_size = size(m)
+    m = m + '1'
+    if size(m) % 1024 != 895 then m = pad(m, 0, 895-size(m) % 1024)
+    m = m + u128(old_size)
+    m1, m2, ..., mN = divide_into_blocks(m, 1024) // mi is 1024-bit block
+    MD = init_buffer(512)
+    return process([m1, ..., mN])
+
+```
+
+
 
 ---
 # Asimetrična kriptografija 
@@ -40,37 +94,40 @@ Stefan Nožinić (stefan@lugons.org)
 ![bg contain](./diagrams/8.png)
 
 ---
-# Append-only log 
+# RSA algoritam 
 
-Vreme  | Autor | Podaci
--------|-------|------
-15616  |A      | ....
-28615  |B      | ....
-30160  |C      | ....
+---
+
+**Primalac:**
+
++ generiši 2 različita prosta broja \( p \) i \( q \)
++ neka 
+$$ n = pq $$
++ izaberi ceo broj e tako da 
+$$ \gcd(e, (p-1)(q-1)) = 1 $$
++ javni ključ je par 
+$$(e, n)$$
++ izračunaj d tako da 
+$$ ed \equiv 1 \ (\mod \ (p-1)(q-1)) $$
++ privatni ključ je par (d, n)
+
+---
+
+**Enkripcija:** Datu poruku  m, pošiljalac prvo proverava da li je 
+$$ \gcd(m, n) = 1 $$
+, sada se šifrovana poruka može izračunati kao
+
+$$ m' = \text{rem}(m^e, n) $$
 
 
 ---
-# Konsenzus 
+**Dekripcija:** Primalac dešifruje poruku koristeći tajni ključ
 
-![](./diagrams/2.png)
-
-
-
----
-# Byzantine Fault Tolerance
-
-![](./diagrams/3.png)
-
-
+$$ m = \text{rem}((m')^d, n) $$
 
 
 ---
-# Double spending
-
-Pošaljilac | Primalac | Vrednost | Kusur
-------|-----------|-------|-------
-A     | B        | $100   | $400
-A     | B        | $600   | $1000
+# Sprečavanje raznih napada
 
 ---
 # Sybil attack 
@@ -78,101 +135,32 @@ A     | B        | $600   | $1000
 
 ![](./diagrams/4.png)
 
----
-# HashCash 
-
 --- 
 # Proof of work 
 
----
-# Transakcija 
+```
+function proof_of_work(data, k):
+    nonce = initial_nonce()
+    target = "0" * k  // Niz od k nula
 
+    while true:
+        hash_value = H(data || nonce)
+        if hash_value.startswith(target):
+            return nonce
+        nonce = next_nonce(nonce)
 
-Sadrži:
-
-* adresu pošiljaoca
-* adresu primaoca
-* vreme
-* identifikator prethodne transakcije
-* dodatne metapodatke u zavisnosti od konkretne implementacije
-* podatke (npr, vrednost, kod, ...)
-* potpis privatnim ključem pošiljaoca
-
-
----
-# Ledger
-
-* Transakcijski ledger 
-* bilansni ledger
-
-
----
-# Bilansni ledger
-
-Nalog | Stanje
-------|------
-A     | $300
-B     | $400
-C     | $1000
-
-
----
-Nalog | Stanje
-------|------
-A     | $0
-B     | $400
-C     | $1300
-
-
----
-# Transakcijski ledger
-
-Pošaljilac | Primalac | Vrednost | Kusur
-------|-----------|-------|-------
-A     | B        | $100   | $400
-B     | C        | $100   | $1000
-C     | A        | $100   | $0
+function H(x):
+    // Implementacija hash funkcije (npr. SHA-256)
+    return sha256(x)
 
 
 
-
-
----
-# Blokovi 
-
-![](./diagrams/5.png)
-
-
-
-
+```
 
 ---
 # Motivacija za PoW
 
 * zašto bi neko validirao blokove ako može da se osloni na druge čvorove da rade težak posao?
-
----
-![bg contain](./diagrams/9.png)
-
----
-# Čvorovi u mreži
-
-* full nodes
-* pruning nodes 
-* lightweight nodes 
-* miner nodes
-* mining pool operators 
-* wallets 
-* mempool
----
-# Konsenzus u prisustvu malicioznih procesa
-
-* Proof of work 
-* Proof of stake 
-* Proof of authority 
-* Proof of burn
-* ...
-
 
 ---
 # Bitcoin 
