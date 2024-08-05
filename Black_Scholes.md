@@ -48,11 +48,11 @@ $$ S = \frac{D}{r - g} $$
 ---
 # Šta su opcije
 
-* Call opcija predstavlja pravo na kupovinu akcija po staroj ceni S(0) u trenutku T
+* Call opcija predstavlja pravo na kupovinu akcija po ceni X u trenutku T
     * T - vreme izvršenja
-    * S(0) - cena izvršenja.
-* put opcije ima pravo da proda u trenutku T.
-* Opcije imaju svoju cenu, V(0)
+    * X - cena izvršenja.
+* put opcija je pravo da proda u trenutku T.
+* Opcije imaju svoju vrednost, C(0)
 * Ako cena akcija padne, call opcija je bezvredna.
 * Ako cena akcija poraste, call opcija generiše profit u iznosu razlike jer se akcije mogu kupiti i odmah prodati.
 
@@ -104,16 +104,16 @@ $$ 0 \le d \le  1 \le u $$
 
 Zamislimo da imamo portfolio od nekog broja date akcije i nekog broja od nerizičnih obveznica. 
 
-$$ V_0 = \Delta S(0) + B $$ 
+$$ C_0 = \Delta S(0) + B $$ 
 
 
 Sada važi da je: 
 
-$$ V_1 = u\Delta S(0) + (1 + r)B $$ 
+$$ C_1 = u\Delta S(0) + (1 + r)B $$ 
 
 sa verovatnćom p, odnosno
 
-$$ V_1 = d\Delta S(0) + (1 + r)B $$ 
+$$ C_1 = d\Delta S(0) + (1 + r)B $$ 
 
 sa verovatnoćom 1-p.
 
@@ -141,7 +141,7 @@ $$ C_0 = \frac{1}{1+r} (\frac{1+r-d}{u-d} C_u + \frac{u - 1 - r}{u-d}C_d) $$
 # Kakve smo pretpostavke napravili?
 
 * Da li vrednost instrumenta zavisi od istorije kretanja? 
-    * Ako da, onda modelujemo Markovljevijim lancima 
+    * Ako da, onda modelujemo Markovljevim lancima 
 * Ako možemo iskoristiti opciju u terminima t1, ..., tn onda 
 
 $$ C_0 = \frac{1}{(1+r)^n} \sum_{k=0}^n {n \choose k} p^k (1-p)^{n-k} \max(0, u^kd^{n-k}S_0 - X) $$ 
@@ -166,7 +166,7 @@ se menja po normalnoj raspodeli.
 ---
 # Black-Scholes jednačina 
 
-$$ \frac{\partial C}{\partial t} + \frac{1}{2} \sigma^2 S^2(t) \frac{\partial^2 C}{\partial S^2} + rS\frac{\partial C}{\partial S} -rC = 0 $$ 
+$$ \frac{\partial C}{\partial t} + \frac{1}{2} \nu^2 S^2(t) \frac{\partial^2 C}{\partial S^2} + rS\frac{\partial C}{\partial S} -rC = 0 $$ 
 
 ---
 # Kako smo došli do ovoga?
@@ -174,7 +174,7 @@ $$ \frac{\partial C}{\partial t} + \frac{1}{2} \sigma^2 S^2(t) \frac{\partial^2 
 
 ---
 
-$$ C(s,t) = e^{-r(T - t)} \int_{-\inf}^\inf \max(S - X, 0)q(S)dS $$ 
+$$ C(s,t) = e^{-r(T - t)} \int_{-\infty}^\infty \max(S - X, 0)q(S)dS $$ 
 
 ---
 # Modeliramo ponašanje cene kao ranije, samo sad imamo za svaki interval dt 
@@ -185,7 +185,7 @@ $$ q(S)dS = \frac{1}{\sqrt{2\pi \sigma^2}}e^{\frac{-(\log S - \mu)^2}{2\sigma^2}
 
 ---
 
-%% E(q(S)) = e^{\mu + \sigma^2 / 2} $$ 
+$$ E(q(S)) = e^{\mu + \sigma^2 / 2} $$ 
 
 Mi želimo da nam očekivanje za S bude: 
 
@@ -207,11 +207,11 @@ $$ dz = \frac{1}{S}dS $$
 
 ---
 
-$$ C(s,t) = e^{-r(T-t)}\int_0^\inf \frac{\max(S - X, 0)}{S} p(t,z) dz $$
+$$ C(s,t) = e^{-r(T-t)}\int_0^\infty \frac{\max(S - X, 0)}{S} p(t,z) dz $$
 
 ---
 
-$$ \frac{\partial C}{\partial t} + \frac{1}{2} \sigma^2 S^2(t) \frac{\partial^2 C}{\partial S^2} + rS\frac{\partial C}{\partial S} -rC = 0 $$ 
+$$ \frac{\partial C}{\partial t} + \frac{1}{2} \nu^2 S^2(t) \frac{\partial^2 C}{\partial S^2} + rS\frac{\partial C}{\partial S} -rC = 0 $$ 
 
 
 
@@ -219,8 +219,8 @@ $$ \frac{\partial C}{\partial t} + \frac{1}{2} \sigma^2 S^2(t) \frac{\partial^2 
 # Rešenje 
 
 $$ C(0, t) = 0 $$ 
-$$ \lim_{S \to \inf} C(S, t) = S-X $$ 
-$$ C(S, T) = \max(S(T) - X, 0) $$ 
+$$ \lim_{S \to \infty} C(S, t) = S-X $$ 
+$$ C(S(T), T) = \max(S(T) - X, 0) $$ 
 
 ---
 
@@ -233,11 +233,11 @@ $$ d = u - \nu\sqrt{T - t} $$
 ---
 # Numeričko rešavanje
 
-$$ \int_0^\inf f(x)dx = \int_0^1 f(\frac{t}{1 - t})\frac{dt}{(1 - t)^2} $$ 
+$$ \int_0^\infty f(x)dx = \int_0^1 f(\frac{t}{1 - t})\frac{dt}{(1 - t)^2} $$ 
 
 Sada integral ovakvog tipa možemo rešiti Monte Karlo metodom:
 
-$$ \int_0^1 f(\frac{t}{1 - t})\frac{dt}{(1 - t)^2} = \frac{1}{N} \sum_{i=1}^N f(\frac{t_i}{1 - t_i})\frac{(1 - t_i)^2} $$ 
+$$ \int_0^1 f(\frac{t}{1 - t})\frac{dt}{(1 - t)^2} = \frac{1}{N} \sum_{i=1}^N f(\frac{t_i}{1 - t_i})\frac{1}{(1 - t_i)^2} $$ 
 
 ---
 # Zaključak
