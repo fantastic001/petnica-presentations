@@ -152,7 +152,7 @@ Problemi koje možemo rešiti u polinomnom vremenu - postoji algoritam koji reš
 ---
 # Skup NP 
 
-Problemi čije ršene možemo proveriti u polinomnom vremenu.
+Problemi čije rešenje možemo proveriti u polinomnom vremenu.
 
 $$ P \subseteq NP $$ 
 
