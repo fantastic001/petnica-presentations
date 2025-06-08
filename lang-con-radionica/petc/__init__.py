@@ -179,6 +179,33 @@ class Parser:
 
     
 
+# Zadatak: Implementirati type checking pre izvršavanja programa
+# Na primer, svi izrazi mogu biti objekti koji imaju metodu __call__ koja se može pozvati da se evaluiraju izrazi ali pored toga postoji i metoda check(symbols) koja proverava da li su svi izrazi ispravni pre izvršavanja programa.
+
+class Expression:
+    def __call__(self, symbols):
+        raise NotImplementedError("Subclasses should implement this method")
+    
+    def check(self, symbols):
+        return None  # Placeholder for type checking logic
+    
+class Plus(Expression):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def __call__(self, symbols):
+        return lambda x, y: x + y
+    
+    def check(self, symbols):
+        args_valid = self.left.check(symbols) and self.right.check(symbols) 
+        left_type = self.left.check(symbols)
+        right_type = self.right.check(symbols)
+        if left_type != right_type:
+            return None 
+        return left_type
+
 parser = tatsu.compile(syntax, semantics=Parser())
 
 def parse(text):
