@@ -1,0 +1,265 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis} % modern dark-friendly theme
+\usepackage[utf8]{inputenc}
+\usepackage[serbian]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Dark theme adjustments
+\definecolor{bgcolor}{RGB}{20,20,25}
+\definecolor{codegray}{gray}{0.9}
+\definecolor{mintgreen}{RGB}{0,255,180}
+\setbeamercolor{background canvas}{bg=bgcolor}
+\setbeamercolor{normal text}{fg=white}
+
+\lstset{
+  backgroundcolor=\color{black},
+  basicstyle=\ttfamily\footnotesize\color{white},
+  keywordstyle=\color{mintgreen},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange},
+  showstringspaces=false,
+  frame=single,
+  rulecolor=\color{gray},
+  breaklines=true
+}
+
+\title{Kvantno računarstvo}
+\author{Stefan Nožinić}
+\date{Oktobar 2025}
+
+\begin{document}
+
+\maketitle
+
+% --- Slide 1 ---
+\begin{frame}{Klase problema u računarstvu}
+\begin{itemize}
+    \item Pojmovi: P, NP, NP-težak, NP-kompletan, EXP
+    \item Zašto su ovi pojmovi važni?
+\end{itemize}
+\end{frame}
+
+% --- Slide 2 ---
+\begin{frame}{Klasa P}
+\begin{itemize}
+    \item P (Polynomial time) je klasa problema koji se mogu rešiti u polinomijalnom vremenu na determinističkom Turingovom mašinom.
+    \item Primeri problema u P:
+    \begin{itemize}
+        \item Sortiranje niza brojeva
+        \item Pronalaženje najkraćeg puta u grafu (Dijkstra algoritam)
+        \item Provera da li je broj paran
+        \item Množenje dva broja
+        \item Pretraga u sortiranoj listi (binarna pretraga)
+        \item Računanje najvećeg zajedničkog delioca (GCD)
+    \end{itemize}
+    \item Problemi u P su efikasno rešivi na klasičnim računarima.
+\end{itemize}
+\end{frame}
+
+% --- Slide 3 ---
+\begin{frame}{Klasa NP}
+\begin{itemize}
+    \item NP (Nondeterministic Polynomial time) — problemi čija se rešenja mogu proveriti u polinomijalnom vremenu.
+    \item Primeri:
+    \begin{itemize}
+        \item Svi problemi iz klase P
+        \item TSP
+        \item SAT
+        \item Problem bojenja grafa
+        \item Faktorizacija velikih brojeva
+    \end{itemize}
+    \item Otvoreno pitanje: Da li je P = NP?
+\end{itemize}
+\end{frame}
+
+% --- Slide 4 ---
+\begin{frame}{NP-težak i NP-kompletan}
+\begin{itemize}
+    \item NP-težak (NP-hard): bar toliko težak kao i najteži problemi u NP.
+    \item NP-kompletan (NP-complete): u NP i NP-težak.
+    \item Ako se bilo koji NP-kompletan problem reši u polinomijalnom vremenu, P = NP.
+    \item Primeri:
+    \begin{itemize}
+        \item SAT
+        \item Problem bojenja grafa
+        \item TSP
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+% --- Slide 5 ---
+\begin{frame}{Klasa EXP}
+\begin{itemize}
+    \item EXP — problemi rešivi u eksponencijalnom vremenu.
+    \item Primeri:
+    \begin{itemize}
+        \item Problemi kombinatorike i optimizacije
+        \item Problemi koji zahtevaju ispitivanje svih kombinacija
+    \end{itemize}
+    \item Veza: svi problemi u NP su u EXP, ali obrnuto nije poznato.
+\end{itemize}
+\end{frame}
+
+% --- Slide 6 ---
+\begin{frame}{Kvantno računarstvo i klase problema}
+\begin{itemize}
+    \item Kvantni računari koriste kubite i fenomene superpozicije i uplitanja.
+    \item Mogu rešavati određene probleme efikasnije:
+    \begin{itemize}
+        \item Šorov algoritam — faktorizacija
+        \item Groverov algoritam — pretraga
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+% --- Slide 7 ---
+\begin{frame}{Double Slit Experiment}
+\begin{itemize}
+    \item Pokazuje dualnost talasa i čestica.
+    \item Osnova za razumevanje superpozicije i kvantnih stanja.
+\end{itemize}
+\end{frame}
+
+% --- Slide 8 ---
+\begin{frame}{Kubiti i superpozicija}
+\begin{itemize}
+    \item Kubit: osnovna jedinica kvantne informacije.
+    \item Može biti u stanju $|0\rangle$, $|1\rangle$ ili superpoziciji oba:
+\end{itemize}
+
+\[
+|\psi\rangle = \alpha|0\rangle + \beta|1\rangle
+\]
+
+\[
+|\alpha|^2 + |\beta|^2 = 1
+\]
+\end{frame}
+
+% --- Slide 9 ---
+\begin{frame}{Inherentni paralelizam kvantnog računarstva}
+\begin{itemize}
+    \item Sa $n$ kubita, moguće je istovremeno obrađivati $2^n$ stanja.
+    \item Kvantni paralelizam omogućava simultano izračunavanje funkcije $f(x)$ za sve ulaze.
+\end{itemize}
+\end{frame}
+
+% --- Slide 10 ---
+\begin{frame}{Ket notacije}
+\[
+|0\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \quad
+|1\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix}
+\]
+\[
+|\psi\rangle = \alpha \begin{pmatrix}1 \\ 0\end{pmatrix} + \beta \begin{pmatrix}0 \\ 1\end{pmatrix}
+= \begin{pmatrix}\alpha \\ \beta\end{pmatrix}
+\]
+\end{frame}
+
+% --- Slide 11 ---
+\begin{frame}{Kvantne logičke operacije}
+\[
+U = \begin{pmatrix} a & b \\ c & d \end{pmatrix}, \quad U^\dagger U = I
+\]
+\begin{itemize}
+    \item Kvantne operacije su unitarne i reverzibilne.
+    \item Za razliku od klasičnih logičkih kola (AND, OR), ne gube informaciju.
+\end{itemize}
+\end{frame}
+
+% --- Slide 12 ---
+\begin{frame}{Kvantna kola}
+\begin{itemize}
+    \item Sekvence unitarnih operacija nad kubitima.
+    \item Primeri:
+    \begin{itemize}
+        \item Hadamardovo kolo
+        \item CNOT
+        \item Pauli-X, Y, Z
+        \item Phase gate
+        \item Toffoli
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+% --- Slide 13 ---
+\begin{frame}[fragile]{Primer kvantnog kola u QisKit}
+\begin{lstlisting}[language=Python]
+import numpy as np
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(3)
+qc.h(0)
+qc.p(np.pi / 2, 0)
+qc.cx(0, 1)
+qc.cx(0, 2)
+print(qc.draw('text'))
+\end{lstlisting}
+\end{frame}
+
+% --- Slide 14 ---
+\begin{frame}{Hadamardovo kolo}
+\[
+H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+\]
+\[
+H|0\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle) = |+\rangle
+\]
+\[
+H|1\rangle = \frac{1}{\sqrt{2}}(|0\rangle - |1\rangle) = |-\rangle
+\]
+
+
+Inverzna operacija: $H^{-1} = H$
+\end{frame}
+
+\begin{frame}
+    \frametitle{Hadamardovo kolo sa n kubita}
+
+    $$
+H^{\otimes N} = \frac{1}{\sqrt{2^N}} \begin{pmatrix}
+1 & 1 & 1 & \cdots & 1 \\
+1 & -1 & 1 & \cdots & -1 \\
+1 & 1 & -1 & \cdots & -1 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & -1 & -1 & \cdots & 1
+\end{pmatrix} $$
+
+
+$$ H^{\otimes N}_{i,j} = \frac{(-1)^{i \cdot j}}{\sqrt{2^N}} $$
+\end{frame}
+
+\begin{frame}
+    \frametitle{Superpozicija svih stanja sa n kubita}
+
+
+    $$ H^{\otimes N} |0\rangle^{\otimes N} = \frac{1}{\sqrt{2^N}} \sum_{x=0}^{2^N-1} |x\rangle $$
+
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Pauli-X kolo}
+
+
+$$ X|0\rangle = |1\rangle $$
+
+$$ X|1\rangle = |0\rangle $$
+
+
+$$ X = \begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix} $$
+
+$$ X^{\otimes N} = X \otimes X \otimes \cdots \otimes X $$
+
+$$ X^{\otimes N} |x\rangle = |(2^N - 1) - x\rangle $$    
+
+$$ X^{-1} = X $$
+
+\end{frame}
+
+\end{document}
