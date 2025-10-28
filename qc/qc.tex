@@ -262,4 +262,156 @@ $$ X^{-1} = X $$
 
 \end{frame}
 
+\begin{frame}
+    \frametitle{Pauli-X kolo}
+
+$$ X|0\rangle = |1\rangle $$
+
+$$ X|1\rangle = |0\rangle $$
+    
+$$ X = \begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix} $$
+
+$$ X^{\otimes N} |x\rangle = |(2^N - 1) - x\rangle $$
+
+$$ X^{-1} = X $$
+\end{frame}
+
+\begin{frame}
+    \frametitle{Z kolo}
+$$ Z|0\rangle = |0\rangle $$
+
+$$ Z|1\rangle = -|1\rangle $$
+
+$$ Z = \begin{pmatrix}
+1 & 0 \\
+0 & -1
+\end{pmatrix} $$
+
+$$ Z^{\otimes N} |x\rangle = |(2^N - 1) - x\rangle $$
+
+$$ Z^{-1} = Z $$
+\end{frame}
+
+\begin{frame}
+    \frametitle{CNOT kolo}
+
+    $$ CNOT|00\rangle = |00\rangle $$
+
+$$ CNOT|01\rangle = |01\rangle $$
+
+$$ CNOT|10\rangle = |11\rangle $$
+
+$$ CNOT|11\rangle = |10\rangle $$
+
+$$ CNOT|c t\rangle = |c (t \oplus c)\rangle $$
+    
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Inverzija za CNOT kolo}
+
+$$ CNOT(CNOT|c t\rangle) = CNOT|c (t \oplus c)\rangle = |c ((t \oplus c) \oplus c)\rangle = |c t\rangle $$    
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{CZ kolo}
+
+    $$ CZ|00\rangle = |00\rangle $$
+
+    $$ CZ|01\rangle = |01\rangle $$
+
+    $$ CZ|10\rangle = |10\rangle $$
+
+    $$ CZ|11\rangle = -|11\rangle $$
+
+    $$ CZ|c t\rangle = (-1)^{c \land t} |c t\rangle $$
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Toffoli kolo}
+
+    $$ TOFFOLI|abc\rangle = |ab(c \oplus (a \land b))\rangle $$
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Inverzija za Toffoli kolo}
+
+    $$ TOFFOLI(TOFFOLI|abc\rangle) = TOFFOLI|ab(c \oplus (a \land b))\rangle = |ab((c \oplus (a \land b)) \oplus (a \land b))\rangle = |abc\rangle $$
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Kako možemo  da prevedemo klasična logička kola u kvantna?}
+
+    \begin{itemize}
+        \item AND kolo $\rightarrow$ Toffoli kolo
+        \item OR kolo $\rightarrow$ kombinacija X i Toffoli kola
+        \item NOT kolo $\rightarrow$ Pauli-X kolo 
+    \end{itemize}    
+\end{frame}
+
+% Entanglement
+
+\begin{frame}
+    \frametitle{Zapletanje (Entanglement)}
+
+    \begin{itemize}
+        \item Kvantna stanja dva ili više kubita su zapletena ako stanje jednog kubita ne može biti opisano nezavisno od stanja drugog kubita.
+        \item Primer: Bellovo stanje: $ |\Phi^+\rangle = \frac{1}{\sqrt{2}} (|00\rangle + |11\rangle) $
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Groverov algoritam}
+    \begin{itemize}
+        \item Kvantni algoritam za pretragu nestrukturirane baze podataka.
+        \item Vreme izvršavanja: $O(\sqrt{N})$ u poređenju sa klasičnim $O(N)$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Ideja Groverovog algoritma}
+    \begin{itemize}
+        \item Inicijalizacija superpozicije svih mogućih stanja.
+        \item Primena orakla koji označava traženi element.
+        \item Primena difuzionog operatora za pojačavanje verovatnoće označenog stanja.
+        \item Ponavljanje koraka dok se verovatnoća ne maksimizira.
+    \end{itemize}    
+\end{frame}
+
+\begin{frame}
+    Neka je $N$ broj elemenata u bazi podataka
+    \begin{itemize}
+        \item Inicijalizacija: $ |\psi_0\rangle = \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} |x\rangle $
+        \item Orakl: $ O|x\rangle = -|x\rangle $ ako je $x$ traženi element, inače $O|x\rangle = |x\rangle $
+        \item Difuzioni operator: $ D = 2|\psi_0\rangle \langle \psi_0| - I $
+        \item Difuzioni operator pojačava verovatnoću traženog elementa.
+        \item Iteracija: $ |\psi_{k+1}\rangle = D O |\psi_k\rangle $
+        \item Broj iteracija: $ O(\sqrt{N}) $
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Difuzioni operator}
+
+    $$ D = 2|\psi_0\rangle \langle \psi_0| - I $$
+
+    \begin{itemize}
+        \item $|\psi_0\rangle = \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} |x\rangle$
+        \item $I$ je identitetski operator
+        \item Difuzioni operator reflektuje stanje oko prosečne amplitude svih stanja.
+    \end{itemize}
+
+\end{frame}
+
 \end{document}
