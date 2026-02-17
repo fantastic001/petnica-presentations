@@ -84,6 +84,8 @@ class TM:
         head_indicator.next_to(tape_cells[self.head_pos], UP)
         state_text = Text(self.state).to_edge(UP)
         scene.add(tape_cells, head_indicator, state_text, cell_texts)
+        
+        scene.play(*[cell.animate.set_fill(GRAY if i == self.head_pos else BLACK, opacity=1) for i, cell in enumerate(tape_cells)])
         for _ in range(max_steps):
             old_pos = self.head_pos
             self.step()
@@ -97,21 +99,14 @@ class TM:
                 )
             )
             new_state_text = Text(self.state).to_edge(UP)
+            # Update visualization
             scene.play(
+                head_indicator.animate.next_to(tape_cells[self.head_pos], UP),
+                *[cell.animate.set_fill(GRAY if i == self.head_pos else BLACK, opacity=1) for i, cell in enumerate(tape_cells)],
                 ReplacementTransform(state_text, new_state_text)
             )
             state_text = new_state_text
             cell_texts[old_pos] = new_text
-            # Update visualization
-            scene.play(
-                head_indicator.animate.next_to(tape_cells[self.head_pos], UP),
-            )
-            scene.play(*[cell.animate.set_color(WHITE if i == self.head_pos else GREY) for i, cell in enumerate(tape_cells)])
-            state_text.animate.set_text(f"{self.state}")
-            scene.play(
-                *[cell.animate.set_color(WHITE if i == self.head_pos else GREY) for i, cell in enumerate(tape_cells)],
-            )
-            
             if self.state in self.final_states:
                 break
 
