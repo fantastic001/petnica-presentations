@@ -125,6 +125,47 @@ $$ m' = \text{rem}(m^e, n) $$
 
 $$ m = \text{rem}((m')^d, n) $$
 
+---
+
+![bg contain](./diagrams/arch.png)
+
+---
+
+# Dva tipa knjiga:
+
+-   transaction ledger
+-   balance ledger
+
+
+---
+# Oba tipa moraju biti:
+
+-   imutabilna 
+-   timestamped
+-   tačna
+-   komprehensivna
+
+---
+# Transakcije
+
+-   adresa pošiljaoca
+-   adresa primaoca
+-   iznos ili podaci ili kod ili nešto slično
+-   potpis transakcije privatnim ključem pošiljaoca
+-   vremenska oznaka
+-   indeks prethodne transakcije (heš bloka i indeks transakcije unutar bloka)
+
+---
+# Zaglavlje bloka:
+
+-   verzija
+-   heš zaglavlja prethodnog bloka
+-   korenski čvor Merkle stabla
+-   nonce 
+-   vremenska oznaka
+-   potpis kreatora bloka
+-   heš zaglavlja ovog bloka
+
 
 ---
 # Sprečavanje raznih napada
