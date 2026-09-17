@@ -35,7 +35,7 @@ style: |
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-# Veliki jezički modeli
+# Kako računari pričaju? I nešto više...
 
 ## od modela u nauci do agenata koji dokazuju teoreme
 
