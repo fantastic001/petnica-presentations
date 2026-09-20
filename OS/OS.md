@@ -1,5 +1,5 @@
 ---
-marp: false
+marp: true
 ---
 
 # Operativni sistemi 

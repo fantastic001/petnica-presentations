@@ -1,4 +1,6 @@
-
+---
+marp: true
+---
 # OOP - objektivno opširno predavanje 
 
 Stefan Nožinić <stefan@lugons.org>

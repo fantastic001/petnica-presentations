@@ -1,5 +1,6 @@
-
-
+---
+marp: true
+---
 # IoT
 
 Stefan Nožinić (<stefan@lugons.org>)

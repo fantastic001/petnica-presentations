@@ -47,6 +47,7 @@ marp_sources() {
 is_presentation() {
     local presentation_dir="$1"
     [ -d "${presentation_dir}" ] || return 1
+    [ -f "${presentation_dir}/${PRESENTATION_BUILD_SCRIPT}" ] && return 0
     [ -n "$(marp_sources "${presentation_dir}")" ]
 }
 

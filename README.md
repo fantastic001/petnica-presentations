@@ -1,7 +1,16 @@
 # Petnica prezentacije
 
-Svaka prezentacija je jedan direktorijum sa Marp fajlom (`marp: true` u
-zaglavlju). Ako direktorijum ima `figures.py`, slike se prave pre PDF-a.
+Svaka prezentacija živi u svom direktorijumu. Direktorijum se gradi ako
+ima Marp fajl (`marp: true` u zaglavlju) ili svoj `build.sh`. Ako ima i
+`figures.py`, slike se prave pre PDF-a, a slike stoje uz prezentaciju.
+
+Formati koji se grade:
+
+| Format | Kako se gradi |
+|---|---|
+| Marp markdown | podrazumevano, `marp` |
+| LaTeX (`fp`, `git-predavanje`, `projekat`, `projekat-letnji`, `tla_plus`) | `build.sh` u tom direktorijumu, `latexmk` |
+| LibreOffice (`hpc`) | `build.sh` u tom direktorijumu, `soffice` |
 
 ## Gradnja
 

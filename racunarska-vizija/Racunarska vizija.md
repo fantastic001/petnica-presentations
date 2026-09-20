@@ -1,3 +1,6 @@
+---
+marp: true
+---
 # Računarska vizija
 Stefan Nožinić (<stefan@lugons.org>)
 
