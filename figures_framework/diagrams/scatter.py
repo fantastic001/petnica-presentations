@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 
 from ..context import FigureContext
-from ..layout import Extent
+from ..layout import Extent, FigureScale
 from ..schematics import BoxSize
 from .base import DiagramNode, canvas_for_extent
 
@@ -16,12 +16,17 @@ class SplitDiagram:
     splitter: DiagramNode
     groups: list[DiagramNode]
     sample_size: int = 24
+    scale: FigureScale = FigureScale(
+        units_per_inch=1.25, vertical_units_per_inch=1.6
+    )
 
     def extent(self) -> Extent:
         return Extent(left=-6.0, right=6.0, bottom=-4.0, top=3.8)
 
     def render(self, context: FigureContext) -> plt.Figure:
-        canvas = canvas_for_extent(context, self.extent(), padding=0.2)
+        canvas = canvas_for_extent(
+            context, self.extent(), padding=0.2, scale=self.scale
+        )
         cloud = context.random.uniform(
             [-5.3, -2], [-2.7, 2], size=(self.sample_size, 2)
         )

@@ -111,7 +111,9 @@ class FunnelDiagram:
     spacing: float = 3.4
     box_width: float = 2.0
     note: str = ""
-    scale: FigureScale = FigureScale(units_per_inch=1.15)
+    scale: FigureScale = FigureScale(
+        units_per_inch=1.15, vertical_units_per_inch=1.33
+    )
 
     def heights(self) -> list[float]:
         count = len(self.steps)

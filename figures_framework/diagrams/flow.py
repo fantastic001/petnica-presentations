@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from ..context import FigureContext
 from ..layout import (
     CaptionPlacement,
+    FigureScale,
     Extent,
     Orientation,
     Point,
@@ -186,6 +187,9 @@ class StackedDiagrams:
     rows: list[tuple[str, MergeFlowDiagram | FlowDiagram]]
     row_spacing: float = 3.6
     label_width: float = 2.6
+    scale: FigureScale = FigureScale(
+        units_per_inch=1.2, vertical_units_per_inch=1.58
+    )
 
     def extent(self) -> Extent:
         merged = self.rows[0][1].extent()
@@ -201,7 +205,9 @@ class StackedDiagrams:
 
     def render(self, context: FigureContext) -> plt.Figure:
         extent = self.extent()
-        canvas = canvas_for_extent(context, extent, padding=0.3)
+        canvas = canvas_for_extent(
+            context, extent, padding=0.3, scale=self.scale
+        )
         for (title, diagram), offset in zip(self.rows, self._offsets()):
             diagram.draw(canvas, (0.0, offset))
             canvas.axes.text(
