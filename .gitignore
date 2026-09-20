@@ -14,3 +14,7 @@
 .DS_Store
 dist/
 */img/*
+**.nav
+**.snm
+**.vrb
+**.toc
