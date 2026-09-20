@@ -1,233 +1,201 @@
 from __future__ import annotations
 
-import logging
 import math
-import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 
-SHARED_FIGURES_DIRECTORY = (
-    Path(__file__).resolve().parent.parent / "naucni-metod"
-)
-sys.path.insert(0, str(SHARED_FIGURES_DIRECTORY))
+import matplotlib
+
+matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import Circle, FancyBboxPatch
 
-from figures import (
-    AQUA,
-    BLUE,
-    GREEN,
-    GRID,
-    INK,
-    MAGENTA,
-    MUTED_INK,
-    ORANGE,
-    RED,
-    SURFACE,
-    VIOLET,
-    YELLOW,
-    configure_style,
-    create_blank_canvas,
-    draw_arrow,
-    draw_box,
-    point_between,
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
+
+from figures_framework.diagrams import (
+    DiagramNode,
+    EquationTermsDiagram,
+    FeedbackLoopDiagram,
+    FlowDiagram,
+    FunnelDiagram,
+    LayeredNetworkDiagram,
+    LayeredStackDiagram,
+    MergeFlowDiagram,
+    NestedSetsDiagram,
+    RepeatedGroup,
+    SpectrumDiagram,
+    StackedDiagrams,
+    TimelineDiagram,
+    VerificationLoopDiagram,
+)
+from figures_framework import (
+    DEFAULT_DIAGRAM_SIZE,
+    DEFAULT_WIDE_SIZE,
+    BoxSize,
+    FigureContext,
+    FigureRegistry,
+    GridSpecification,
+    TimelineEvent,
+    environment_integer,
+    fit_polynomial,
+    polynomial_features,
+    render_registry,
 )
 
-OUTPUT_DIRECTORY = Path(
-    os.environ.get("LLM_FIGURES_OUTPUT_DIR", Path(__file__).parent / "img")
+FIGURES = FigureRegistry("llm")
+DEFAULT_OUTPUT_DIRECTORY = Path(__file__).parent / "img"
+DEFAULT_SEED = 7
+OVERFIT_BAND_COLOR = "#fdecea"
+BIAS_VARIANCE_REPETITIONS = environment_integer(
+    "BIAS_VARIANCE_REPETITIONS", 300
 )
-OUTPUT_FORMAT = os.environ.get("LLM_FIGURES_FORMAT", "svg")
-FIGURE_DPI = int(os.environ.get("LLM_FIGURES_DPI", "150"))
-RANDOM_SEED = int(os.environ.get("LLM_FIGURES_SEED", "7"))
-SELECTED_FIGURES = os.environ.get("LLM_FIGURES_ONLY", "")
-BIAS_VARIANCE_REPETITIONS = int(
-    os.environ.get("BIAS_VARIANCE_REPETITIONS", "300")
-)
-FIGURE_SIZE_WIDE = (10, 4.6)
-FIGURE_SIZE_DIAGRAM = (10, 5)
-
-log = logging.getLogger("llm-figures")
 
 
-def save_figure(figure: plt.Figure, name: str) -> None:
-    path = OUTPUT_DIRECTORY / f"{name}.{OUTPUT_FORMAT}"
-    figure.tight_layout()
-    figure.savefig(path, format=OUTPUT_FORMAT, dpi=FIGURE_DPI)
-    plt.close(figure)
-    log.info("saved %s", path)
-
-
-def draw_chain(axes, labels_and_colors, y=0.0, spacing=3.0, width=2.4,
-               height=1.0) -> list[tuple[float, float]]:
-    offset = spacing * (len(labels_and_colors) - 1) / 2
-    centers = [
-        (index * spacing - offset, y)
-        for index in range(len(labels_and_colors))
-    ]
-    for (label, color), center in zip(labels_and_colors, centers):
-        draw_box(axes, center, label, color, width=width, height=height)
-    for start, end in zip(centers, centers[1:]):
-        draw_arrow(
-            axes,
-            (start[0] + width / 2 + 0.05, y),
-            (end[0] - width / 2 - 0.05, y),
-        )
-    return centers
-
-
-def figure_model_map() -> None:
-    generator = np.random.default_rng(RANDOM_SEED)
-    figure, axes = create_blank_canvas(FIGURE_SIZE_DIAGRAM)
+@FIGURES.register("model_map")
+def render_model_map(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    generator = context.random
+    canvas = context.blank_canvas(DEFAULT_DIAGRAM_SIZE)
+    axes = canvas.axes
     cloud = generator.normal([-4, 0], [0.7, 0.9], size=(160, 2))
-    axes.scatter(cloud[:, 0], cloud[:, 1], s=14, color=MUTED_INK, alpha=0.6)
-    axes.text(-4, 2.3, "Svet", ha="center", fontsize=20, color=INK)
+    axes.scatter(
+        cloud[:, 0],
+        cloud[:, 1],
+        s=14,
+        color=palette.muted_ink,
+        alpha=0.6,
+    )
+    axes.text(-4, 2.3, "Svet", ha="center", fontsize=20, color=palette.ink)
     axes.text(-4, -2.4, "složen, pun šuma", ha="center", fontsize=14,
-              color=MUTED_INK)
-    draw_arrow(axes, (-2.6, 0), (-1.3, 0))
-    draw_box(axes, (0, 0), "Model\n$y = f(x)$", BLUE, 2.4, 1.4)
+              color=palette.muted_ink)
+    canvas.draw_arrow((-2.6, 0), (-1.3, 0))
+    canvas.draw_box(
+        (0, 0),
+        "Model\n$y = f(x)$",
+        palette.blue,
+        BoxSize(2.4, 1.4),
+    )
     axes.text(0, -1.4, "uprošćenje", ha="center", fontsize=14,
-              color=MUTED_INK)
-    draw_arrow(axes, (1.3, 0), (2.6, 0))
-    draw_box(axes, (4, 0), "Predikcija", ORANGE, 2.4, 1.0)
-    draw_arrow(axes, (4, -0.7), (-4, -1.4), color=AQUA, curve=-0.35)
+              color=palette.muted_ink)
+    canvas.draw_arrow((1.3, 0), (2.6, 0))
+    canvas.draw_box((4, 0), "Predikcija", palette.orange, BoxSize(2.4, 1.0))
+    canvas.draw_arrow((4, -0.7), (-4, -1.4), color=palette.aqua, curve=-0.35)
     axes.text(0, -3.0, "proveravamo eksperimentom", ha="center",
-              fontsize=14, color=AQUA)
+              fontsize=14, color=palette.aqua)
     axes.set_xlim(-5.6, 5.6)
     axes.set_ylim(-3.4, 2.9)
-    save_figure(figure, "model_map")
+    return canvas.figure
 
 
-def figure_model_spectrum() -> None:
-    figure, axes = create_blank_canvas((11, 3.6))
-    gradient = np.linspace(0, 1, 256)[None, :]
-    axes.imshow(gradient, extent=(-5, 5, -0.3, 0.3), cmap="Blues",
-                aspect="auto")
-    examples = [
-        (-4.5, "$F = ma$", "Njutn"),
-        (-2.3, "$y = ax + b$", "regresija"),
-        (0.0, "stablo\nodlučivanja", "ML"),
-        (2.3, "neuronska\nmreža", "duboko učenje"),
-        (4.5, "LLM", "$10^{11}$ parametara"),
-    ]
-    for x, top, bottom in examples:
-        axes.plot([x, x], [0.3, 0.55], color=INK, lw=1.5)
-        axes.text(x, 0.65, top, ha="center", va="bottom", fontsize=15)
-        axes.text(x, -0.45, bottom, ha="center", va="top", fontsize=13,
-                  color=MUTED_INK)
-    axes.text(-5, -1.35, "BELA KUTIJA: razumemo svaki deo", ha="left",
-              fontsize=14, color=BLUE, fontweight="bold")
-    axes.text(5, -1.35, "CRNA KUTIJA: radi, ali ne znamo zašto", ha="right",
-              fontsize=14, color=INK, fontweight="bold")
-    axes.set_xlim(-5.4, 5.4)
-    axes.set_ylim(-1.6, 1.6)
-    save_figure(figure, "model_spectrum")
+@FIGURES.register("model_spectrum")
+def render_model_spectrum(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return SpectrumDiagram(
+        marks=[
+            DiagramNode("$F = ma$", palette.ink, "Njutn"),
+            DiagramNode("$y = ax + b$", palette.ink, "regresija"),
+            DiagramNode("stablo\nodlučivanja", palette.ink, "ML"),
+            DiagramNode("neuronska\nmreža", palette.ink, "duboko učenje"),
+            DiagramNode("LLM", palette.ink, "$10^{11}$ parametara"),
+        ],
+        ends=(
+            "BELA KUTIJA: razumemo svaki deo",
+            "CRNA KUTIJA: radi, ali ne znamo zašto",
+        ),
+    ).render(context)
 
 
-def figure_programming_vs_learning() -> None:
-    figure, axes = create_blank_canvas(FIGURE_SIZE_DIAGRAM)
-    axes.text(-5.3, 1.6, "Klasično\nprogramiranje", fontsize=15,
-              va="center", color=INK)
-    draw_box(axes, (-1.2, 2.3), "pravila", BLUE, 2.0, 0.8)
-    draw_box(axes, (-1.2, 0.9), "podaci", AQUA, 2.0, 0.8)
-    draw_box(axes, (1.8, 1.6), "program", MUTED_INK, 2.0, 1.0)
-    draw_box(axes, (4.6, 1.6), "odgovori", ORANGE, 2.0, 0.8)
-    draw_arrow(axes, (-0.15, 2.2), (0.75, 1.75))
-    draw_arrow(axes, (-0.15, 1.0), (0.75, 1.45))
-    draw_arrow(axes, (2.85, 1.6), (3.55, 1.6))
-    axes.plot([-5.4, 5.8], [0, 0], color=GRID, lw=2)
-    axes.text(-5.3, -1.6, "Mašinsko\nučenje", fontsize=15, va="center",
-              color=INK)
-    draw_box(axes, (-1.2, -0.9), "podaci", AQUA, 2.0, 0.8)
-    draw_box(axes, (-1.2, -2.3), "odgovori", ORANGE, 2.0, 0.8)
-    draw_box(axes, (1.8, -1.6), "učenje", MUTED_INK, 2.0, 1.0)
-    draw_box(axes, (4.6, -1.6), "pravila", BLUE, 2.0, 0.8)
-    draw_arrow(axes, (-0.15, -1.0), (0.75, -1.45))
-    draw_arrow(axes, (-0.15, -2.2), (0.75, -1.75))
-    draw_arrow(axes, (2.85, -1.6), (3.55, -1.6))
-    axes.set_xlim(-5.5, 5.9)
-    axes.set_ylim(-3, 3)
-    save_figure(figure, "programming_vs_learning")
+@FIGURES.register("programming_vs_learning")
+def render_programming_vs_learning(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    classical = MergeFlowDiagram(
+        inputs=[
+            DiagramNode("pravila", palette.blue),
+            DiagramNode("podaci", palette.aqua),
+        ],
+        process=DiagramNode("program", palette.muted_ink),
+        output=DiagramNode("odgovori", palette.orange),
+    )
+    learned = MergeFlowDiagram(
+        inputs=[
+            DiagramNode("podaci", palette.aqua),
+            DiagramNode("odgovori", palette.orange),
+        ],
+        process=DiagramNode("učenje", palette.muted_ink),
+        output=DiagramNode("pravila", palette.blue),
+    )
+    return StackedDiagrams(
+        rows=[
+            ("Klasično\nprogramiranje", classical),
+            ("Mašinsko\nučenje", learned),
+        ]
+    ).render(context)
 
 
-def figure_fitting_loss() -> None:
-    generator = np.random.default_rng(RANDOM_SEED)
+@FIGURES.register("fitting_loss")
+def render_fitting_loss(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    generator = context.random
     x = np.linspace(0, 10, 25)
     y = 0.8 * x + 1 + generator.normal(0, 1.2, size=x.size)
     slope = 0.8
-    figure, (fit, loss) = plt.subplots(1, 2, figsize=FIGURE_SIZE_WIDE)
+    figure, (fit, loss) = context.create_figure(
+        DEFAULT_WIDE_SIZE, GridSpecification(1, 2)
+    )
     prediction = slope * x + 1
     for xi, yi, pi in zip(x, y, prediction):
-        fit.plot([xi, xi], [yi, pi], color=ORANGE, lw=1.5)
-    fit.scatter(x, y, color=BLUE, s=30, zorder=3)
-    fit.plot(x, prediction, color=INK)
+        fit.plot([xi, xi], [yi, pi], color=palette.orange, lw=1.5)
+    fit.scatter(x, y, color=palette.blue, s=30, zorder=3)
+    fit.plot(x, prediction, color=palette.ink)
     fit.set_title("greška = rastojanje do prave")
     fit.set_xlabel("$x$")
     fit.set_ylabel("$y$")
     slopes = np.linspace(-0.2, 1.8, 200)
     losses = [np.mean((y - (s * x + 1)) ** 2) for s in slopes]
-    loss.plot(slopes, losses, color=INK)
+    loss.plot(slopes, losses, color=palette.ink)
     current = -0.1
     for _ in range(6):
         gradient = np.mean(-2 * x * (y - (current * x + 1)))
         value = np.mean((y - (current * x + 1)) ** 2)
-        loss.scatter(current, value, color=ORANGE, s=60, zorder=3)
+        loss.scatter(current, value, color=palette.orange, s=60, zorder=3)
         next_value = current - 0.006 * gradient
         next_loss = np.mean((y - (next_value * x + 1)) ** 2)
         loss.annotate("", xy=(next_value, next_loss), xytext=(current, value),
-                      arrowprops={"arrowstyle": "->", "color": ORANGE})
+                      arrowprops={"arrowstyle": "->", "color": palette.orange})
         current = next_value
     loss.set_title("učenje = spuštanje niz grešku")
     loss.set_xlabel("parametar $a$")
     loss.set_ylabel("greška $L(a)$")
-    save_figure(figure, "fitting_loss")
+    return figure
 
 
-def figure_neural_network() -> None:
-    figure, axes = create_blank_canvas(FIGURE_SIZE_DIAGRAM)
-    layers = [3, 5, 5, 2]
-    colors = [AQUA, BLUE, BLUE, ORANGE]
-    positions = []
-    for index, (size, color) in enumerate(zip(layers, colors)):
-        x = index * 3
-        ys = np.linspace(-(size - 1) / 2, (size - 1) / 2, size) * 1.1
-        positions.append([(x, y) for y in ys])
-    for left, right in zip(positions, positions[1:]):
-        for a in left:
-            for b in right:
-                axes.plot([a[0], b[0]], [a[1], b[1]], color=GRID, lw=1.2,
-                          zorder=1)
-    for layer, color in zip(positions, colors):
-        for point in layer:
-            axes.add_patch(Circle(point, 0.32, color=color, zorder=2))
-    labels = ["ulaz", "skriveni slojevi", "", "izlaz"]
-    for index, label in enumerate(labels):
-        if label:
-            x = index * 3 + (1.5 if index == 1 else 0)
-            axes.text(x, -3.4, label, ha="center", fontsize=15,
-                      color=MUTED_INK)
-        else:
-            continue
-    axes.text(4.5, 3.4, "neuron: $y = \\max(0,\\ w_1 x_1 + w_2 x_2 + b)$",
-              ha="center", fontsize=16)
-    axes.set_xlim(-1, 10)
-    axes.set_ylim(-3.9, 3.9)
-    axes.set_aspect("equal")
-    save_figure(figure, "neural_network")
+@FIGURES.register("neural_network")
+def render_neural_network(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return LayeredNetworkDiagram(
+        layer_sizes=[3, 5, 5, 2],
+        layer_colors=[palette.aqua, palette.blue, palette.blue,
+                      palette.orange],
+        layer_labels=["ulaz", "skriveni slojevi", "", "izlaz"],
+        note="neuron: $y = \\max(0,\\ w_1 x_1 + w_2 x_2 + b)$",
+    ).render(context)
 
 
-def figure_next_token() -> None:
+@FIGURES.register("next_token")
+def render_next_token(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     candidates = [
         ("Valjeva", 0.71), ("Beograda", 0.08), ("reke", 0.06),
         ("Novog Sada", 0.03), ("mora", 0.01),
     ]
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
     words = [word for word, _ in candidates][::-1]
     probabilities = [p for _, p in candidates][::-1]
-    colors = [MUTED_INK] * (len(words) - 1) + [ORANGE]
+    colors = [palette.muted_ink] * (len(words) - 1) + [palette.orange]
     axes.barh(words, probabilities, color=colors, height=0.6)
     for index, probability in enumerate(probabilities):
         axes.text(probability + 0.01, index, f"{probability:.2f}",
@@ -236,34 +204,28 @@ def figure_next_token() -> None:
     axes.set_xlabel("$P(\\mathrm{reč} \\mid \\mathrm{prethodne\\ reči})$")
     axes.set_xlim(0, 0.85)
     axes.grid(axis="y", visible=False)
-    save_figure(figure, "next_token")
+    return figure
 
 
-def figure_language_model_timeline() -> None:
+@FIGURES.register("language_model_timeline")
+def render_language_model_timeline(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     events = [
-        (1948, "Šenon:\nn-grami", BLUE),
-        (1966, "ELIZA", MUTED_INK),
-        (1997, "LSTM", VIOLET),
-        (2013, "word2vec", AQUA),
-        (2017, "Transformer", ORANGE),
-        (2020, "GPT-3", RED),
-        (2022, "ChatGPT", GREEN),
-        (2026, "agenti", YELLOW),
+        (1948, "Šenon:\nn-grami", palette.blue),
+        (1966, "ELIZA", palette.muted_ink),
+        (1997, "LSTM", palette.violet),
+        (2013, "word2vec", palette.aqua),
+        (2017, "Transformer", palette.orange),
+        (2020, "GPT-3", palette.red),
+        (2022, "ChatGPT", palette.green),
+        (2026, "agenti", palette.yellow),
     ]
-    figure, axes = create_blank_canvas((12, 3.4))
-    axes.plot([-0.5, len(events) - 0.5], [0, 0], color=INK, lw=2)
-    for index, (year, label, color) in enumerate(events):
-        side = 1 if index % 2 == 0 else -1
-        axes.scatter(index, 0, s=160, color=color, zorder=3)
-        axes.plot([index, index], [0, 0.55 * side], color=color, lw=1.5)
-        axes.text(index, 0.7 * side, label, ha="center",
-                  va="bottom" if side > 0 else "top", fontsize=15)
-        axes.text(index, -0.25 * side, str(year), ha="center",
-                  va="top" if side > 0 else "bottom", fontsize=13,
-                  color=MUTED_INK)
-    axes.set_xlim(-0.8, len(events) - 0.2)
-    axes.set_ylim(-1.8, 1.8)
-    save_figure(figure, "language_model_timeline")
+    return TimelineDiagram(
+        events=[
+            TimelineEvent(label=label, caption=str(year), color=color)
+            for year, label, color in events
+        ]
+    ).render(context)
 
 
 def scaling_loss(compute: np.ndarray, parameters: float) -> np.ndarray:
@@ -272,11 +234,17 @@ def scaling_loss(compute: np.ndarray, parameters: float) -> np.ndarray:
     return 1.7 + capacity_term + data_term
 
 
-def figure_scaling_law() -> None:
+@FIGURES.register("scaling_law")
+def render_scaling_law(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     compute = np.logspace(18, 26, 200)
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
-    sizes = [(1e8, AQUA, "$10^8$"), (1e9, BLUE, "$10^9$"),
-             (1e10, VIOLET, "$10^{10}$"), (1e11, ORANGE, "$10^{11}$")]
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
+    sizes = [
+        (1e8, palette.aqua, "$10^8$"),
+        (1e9, palette.blue, "$10^9$"),
+        (1e10, palette.violet, "$10^{10}$"),
+        (1e11, palette.orange, "$10^{11}$"),
+    ]
     for parameters, color, label in sizes:
         loss = scaling_loss(compute, parameters)
         start = compute >= 6 * parameters * 2e8
@@ -285,7 +253,7 @@ def figure_scaling_law() -> None:
     envelope = np.min(
         [scaling_loss(compute, n) for n in np.logspace(7, 13, 120)], axis=0
     )
-    axes.plot(compute, envelope, color=INK, ls="--", lw=3,
+    axes.plot(compute, envelope, color=palette.ink, ls="--", lw=3,
               label="najbolje za dato $C$")
     axes.set_xscale("log")
     axes.set_yscale("log")
@@ -297,10 +265,12 @@ def figure_scaling_law() -> None:
     axes.set_ylabel("greška $L$")
     axes.set_title("ilustracija zakona skaliranja")
     axes.legend(ncol=2, fontsize=13)
-    save_figure(figure, "scaling_law")
+    return figure
 
 
-def figure_attention_heatmap() -> None:
+@FIGURES.register("attention_heatmap")
+def render_attention_heatmap(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     tokens = ["Mačka", "nije", "pojela", "ribu", "jer", "je", "bila", "sita"]
     size = len(tokens)
     weights = np.full((size, size), 0.02)
@@ -316,7 +286,7 @@ def figure_attention_heatmap() -> None:
     mask = np.triu(np.ones((size, size), dtype=bool), k=1)
     weights = np.where(mask, np.nan, weights)
     weights = weights / np.nansum(weights, axis=1, keepdims=True)
-    figure, axes = plt.subplots(figsize=(7.4, 6.4))
+    figure, axes = context.create_figure((7.4, 6.4))
     axes.grid(False)
     image = axes.imshow(weights, cmap="Blues", vmin=0, vmax=0.8)
     axes.set_xticks(range(size), tokens, rotation=45, ha="right")
@@ -324,61 +294,48 @@ def figure_attention_heatmap() -> None:
     axes.set_xlabel("na koju reč gleda")
     axes.set_ylabel("reč koja pita")
     axes.add_patch(plt.Rectangle((-0.5, 4.5), 1, 1, fill=False,
-                                 edgecolor=ORANGE, lw=3))
+                                 edgecolor=palette.orange, lw=3))
     axes.add_patch(plt.Rectangle((-0.5, 6.5), 1, 1, fill=False,
-                                 edgecolor=ORANGE, lw=3))
+                                 edgecolor=palette.orange, lw=3))
     figure.colorbar(image, ax=axes, fraction=0.046, label="težina pažnje")
-    save_figure(figure, "attention_heatmap")
+    return figure
 
 
-def figure_transformer_block() -> None:
-    figure, axes = create_blank_canvas((8, 7.5))
-    draw_box(axes, (0, -4.2), "Mačka  nije  pojela  ribu ...", MUTED_INK,
-             5.4, 0.8)
-    draw_box(axes, (0, -2.9), "reči → vektori", AQUA, 4.0, 0.8)
-    axes.add_patch(FancyBboxPatch((-2.9, -1.85), 5.8, 3.4,
-                                  boxstyle="round,pad=0.1",
-                                  facecolor="#eef3fb", edgecolor=BLUE,
-                                  lw=2))
-    draw_box(axes, (0, -1.0), "pažnja: ko je važan?", BLUE, 4.4, 0.9)
-    draw_box(axes, (0, 0.6), "obrada svake reči", VIOLET, 4.4, 0.9)
-    axes.text(3.25, -0.2, "× 100", fontsize=22, color=BLUE,
-              fontweight="bold", va="center")
-    draw_box(axes, (0, 2.6), "verovatnoće sledeće reči", ORANGE, 4.8, 0.9)
-    draw_arrow(axes, (0, -3.8), (0, -3.3))
-    draw_arrow(axes, (0, -2.5), (0, -1.5))
-    draw_arrow(axes, (0, -0.55), (0, 0.15))
-    draw_arrow(axes, (0, 1.05), (0, 2.15))
-    axes.set_xlim(-4, 4.6)
-    axes.set_ylim(-4.8, 3.4)
-    save_figure(figure, "transformer_block")
-
-
-def figure_alphafold_pipeline() -> None:
-    figure, axes = create_blank_canvas((12, 3.8))
-    draw_chain(
-        axes,
-        [
-            ("MKTAYIAK...", MUTED_INK),
-            ("slične sekvence\nu evoluciji", AQUA),
-            ("pažnja nad\nparovima", BLUE),
-            ("3D struktura", ORANGE),
+@FIGURES.register("transformer_block")
+def render_transformer_block(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return LayeredStackDiagram(
+        layers=[
+            DiagramNode("Mačka  nije  pojela  ribu ...", palette.muted_ink),
+            DiagramNode("reči → vektori", palette.aqua),
+            DiagramNode("pažnja: ko je važan?", palette.blue),
+            DiagramNode("obrada svake reči", palette.violet),
+            DiagramNode("verovatnoće sledeće reči", palette.orange),
         ],
+        repeated=RepeatedGroup(first=2, last=3, label="× 100"),
+    ).render(context)
+
+
+@FIGURES.register("alphafold_pipeline")
+def render_alphafold_pipeline(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return FlowDiagram(
+        steps=[
+            DiagramNode("MKTAYIAK...", palette.muted_ink, "aminokiseline"),
+            DiagramNode("slične sekvence\nu evoluciji", palette.aqua),
+            DiagramNode("pažnja nad\nparovima", palette.blue,
+                        "Evoformer (Transformer)"),
+            DiagramNode("3D struktura", palette.orange),
+        ],
+        box_size=BoxSize(2.6, 1.3),
         spacing=3.2,
-        width=2.6,
-        height=1.3,
-    )
-    axes.text(-4.8, -1.2, "aminokiseline", ha="center", fontsize=13,
-              color=MUTED_INK)
-    axes.text(1.6, -1.2, "Evoformer (Transformer)", ha="center",
-              fontsize=13, color=MUTED_INK)
-    axes.set_xlim(-6.3, 6.3)
-    axes.set_ylim(-1.7, 1.2)
-    save_figure(figure, "alphafold_pipeline")
+    ).render(context)
 
 
-def figure_contact_map() -> None:
-    generator = np.random.default_rng(RANDOM_SEED)
+@FIGURES.register("contact_map")
+def render_contact_map(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    generator = context.random
     length = 80
     t = np.linspace(0, 6 * math.pi, length)
     coordinates = np.stack(
@@ -391,9 +348,9 @@ def figure_contact_map() -> None:
     distances = np.linalg.norm(
         coordinates[:, None, :] - coordinates[None, :, :], axis=-1
     )
-    figure = plt.figure(figsize=FIGURE_SIZE_WIDE)
+    figure = plt.figure(figsize=DEFAULT_WIDE_SIZE)
     chain = figure.add_subplot(1, 2, 1, projection="3d")
-    chain.plot(*coordinates.T, color=BLUE, lw=2.5)
+    chain.plot(*coordinates.T, color=palette.blue, lw=2.5)
     chain.scatter(*coordinates.T, c=np.arange(length), cmap="Oranges", s=18)
     chain.set_axis_off()
     chain.set_title("struktura")
@@ -403,38 +360,31 @@ def figure_contact_map() -> None:
     contact.set_title("koji parovi su blizu")
     contact.set_xlabel("aminokiselina $j$")
     contact.set_ylabel("aminokiselina $i$")
-    save_figure(figure, "contact_map")
+    return figure
 
 
-def figure_universal_approximation() -> None:
+@FIGURES.register("universal_approximation")
+def render_universal_approximation(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     x = np.linspace(0, 1, 800)
     target = np.sin(2 * math.pi * x) + 0.4 * np.sin(7 * math.pi * x)
     pieces = [3, 8, 30]
-    colors = [AQUA, BLUE, ORANGE]
-    figure, axes_row = plt.subplots(1, 3, figsize=(12, 3.9), sharey=True)
+    colors = [palette.aqua, palette.blue, palette.orange]
+    figure, axes_row = context.create_figure(
+        (12, 3.9),
+        GridSpecification(1, 3, shared_axis="y"),
+    )
     for axes, count, color in zip(axes_row, pieces, colors):
         knots = np.linspace(0, 1, count + 1)
         values = (
             np.sin(2 * math.pi * knots) + 0.4 * np.sin(7 * math.pi * knots)
         )
-        axes.plot(x, target, color=GRID, lw=5)
+        axes.plot(x, target, color=palette.grid, lw=5)
         axes.plot(knots, values, color=color, lw=2.2)
         axes.set_title(f"{count} neurona")
         axes.set_xticks([])
     axes_row[0].set_yticks([])
-    save_figure(figure, "universal_approximation")
-
-
-def polynomial_features(x: np.ndarray, degree: int) -> np.ndarray:
-    return np.vander(x, degree + 1, increasing=True)
-
-
-def fit_polynomial(x, y, degree, regularization=1e-8) -> np.ndarray:
-    features = polynomial_features(x, degree)
-    identity = np.eye(degree + 1)
-    return np.linalg.solve(
-        features.T @ features + regularization * identity, features.T @ y
-    )
+    return figure
 
 
 def true_function(x: np.ndarray) -> np.ndarray:
@@ -446,23 +396,28 @@ def sample_training_set(generator, size: int = 15, noise: float = 0.3):
     return x, true_function(x) + generator.normal(0, noise, size=size)
 
 
-def figure_bias_variance_fits() -> None:
-    generator = np.random.default_rng(RANDOM_SEED)
+@FIGURES.register("bias_variance_fits")
+def render_bias_variance_fits(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    generator = context.random
     grid = np.linspace(0, 1, 300)
     cases = [(1, "premali: pristrasnost"), (3, "taman"),
              (12, "preveliki: varijansa")]
-    figure, axes_row = plt.subplots(1, 3, figsize=(12, 4.2), sharey=True)
+    figure, axes_row = context.create_figure(
+        (12, 4.2),
+        GridSpecification(1, 3, shared_axis="y"),
+    )
     for axes, (degree, title) in zip(axes_row, cases):
         for _ in range(20):
             x, y = sample_training_set(generator)
             coefficients = fit_polynomial(x, y, degree)
             axes.plot(grid, polynomial_features(grid, degree) @ coefficients,
-                      color=BLUE, alpha=0.25, lw=1.5)
-        axes.plot(grid, true_function(grid), color=ORANGE, lw=3)
+                      color=palette.blue, alpha=0.25, lw=1.5)
+        axes.plot(grid, true_function(grid), color=palette.orange, lw=3)
         axes.set_ylim(-2, 2)
         axes.set_title(f"stepen {degree} — {title}", fontsize=15)
         axes.set_xticks([])
-    save_figure(figure, "bias_variance_fits")
+    return figure
 
 
 class BiasVarianceExperiment:
@@ -484,31 +439,48 @@ class BiasVarianceExperiment:
         return float(bias), float(variance)
 
 
-def figure_bias_variance_curve() -> None:
-    experiment = BiasVarianceExperiment(BIAS_VARIANCE_REPETITIONS, RANDOM_SEED)
+@FIGURES.register("bias_variance_curve")
+def render_bias_variance_curve(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    experiment = BiasVarianceExperiment(BIAS_VARIANCE_REPETITIONS, context.seed)
     degrees = np.arange(0, 11)
     results = np.array([experiment.decompose(int(d)) for d in degrees])
     noise = 0.3 ** 2
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
-    axes.plot(degrees, results[:, 0], "o-", color=BLUE,
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
+    axes.plot(degrees, results[:, 0], "o-", color=palette.blue,
               label="pristrasnost²")
-    axes.plot(degrees, results[:, 1], "o-", color=ORANGE, label="varijansa")
+    axes.plot(
+        degrees,
+        results[:, 1],
+        "o-",
+        color=palette.orange,
+        label="varijansa",
+    )
     total = results.sum(axis=1) + noise
-    axes.plot(degrees, total, "o-", color=INK, lw=3, label="ukupna greška")
-    axes.axhline(noise, color=MUTED_INK, ls="--", label="šum")
+    axes.plot(
+        degrees,
+        total,
+        "o-",
+        color=palette.ink,
+        lw=3,
+        label="ukupna greška",
+    )
+    axes.axhline(noise, color=palette.muted_ink, ls="--", label="šum")
     best = int(degrees[np.argmin(total)])
     axes.annotate("najbolji model", xy=(best, total.min()),
                   xytext=(best + 1.5, 0.025), fontsize=15,
-                  arrowprops={"arrowstyle": "->", "color": INK})
+                  arrowprops={"arrowstyle": "->", "color": palette.ink})
     axes.set_yscale("log")
     axes.set_xlabel("složenost modela (stepen polinoma)")
     axes.set_ylabel("greška")
     axes.legend(loc="lower left", ncol=2)
-    save_figure(figure, "bias_variance_curve")
+    return figure
 
 
-def figure_generalization() -> None:
-    generator = np.random.default_rng(RANDOM_SEED)
+@FIGURES.register("generalization")
+def render_generalization(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    generator = context.random
     x_train, y_train = sample_training_set(generator, size=12)
     x_test, y_test = sample_training_set(generator, size=200)
     degrees = np.arange(0, 12)
@@ -521,46 +493,36 @@ def figure_generalization() -> None:
         test_errors.append(np.mean(
             (polynomial_features(x_test, int(degree)) @ coefficients
              - y_test) ** 2))
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
-    axes.plot(degrees, np.maximum(train_errors, 1e-4), "o-", color=BLUE,
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
+    axes.plot(degrees, np.maximum(train_errors, 1e-4), "o-", color=palette.blue,
               label="trening (viđeni podaci)")
-    axes.plot(degrees, test_errors, "o-", color=ORANGE,
+    axes.plot(degrees, test_errors, "o-", color=palette.orange,
               label="test (novi podaci)")
-    axes.axvspan(8.5, 11.5, color=RED, alpha=0.08)
-    axes.text(10, 0.08, "bubanje", ha="center", fontsize=16, color=RED)
+    axes.axvspan(8.5, 11.5, color=OVERFIT_BAND_COLOR)
+    axes.text(10, 0.08, "bubanje", ha="center", fontsize=16, color=palette.red)
     axes.set_yscale("log")
     axes.set_xlabel("složenost modela")
     axes.set_ylabel("greška")
     axes.legend(loc="lower left")
-    save_figure(figure, "generalization")
+    return figure
 
 
-def figure_training_pipeline() -> None:
-    figure, axes = create_blank_canvas((12, 3.8))
-    centers = draw_chain(
-        axes,
-        [
-            ("pred-trening", BLUE),
-            ("fino\npodešavanje", VIOLET),
-            ("učenje iz\npovratne veze", ORANGE),
-            ("asistent", GREEN),
+@FIGURES.register("training_pipeline")
+def render_training_pipeline(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return FlowDiagram(
+        steps=[
+            DiagramNode("pred-trening", palette.blue,
+                        "ceo internet\n„predvidi sledeću reč”"),
+            DiagramNode("fino\npodešavanje", palette.violet,
+                        "primeri razgovora\nkoje pišu ljudi"),
+            DiagramNode("učenje iz\npovratne veze", palette.orange,
+                        "ljudi i testovi\nocenjuju odgovore"),
+            DiagramNode("asistent", palette.green),
         ],
+        box_size=BoxSize(2.6, 1.3),
         spacing=3.3,
-        width=2.6,
-        height=1.3,
-    )
-    captions = [
-        "ceo internet\n„predvidi sledeću reč”",
-        "primeri razgovora\nkoje pišu ljudi",
-        "ljudi i testovi\nocenjuju odgovore",
-        "",
-    ]
-    for (x, _), caption in zip(centers, captions):
-        axes.text(x, -1.1, caption, ha="center", va="top", fontsize=13,
-                  color=MUTED_INK)
-    axes.set_xlim(-6.6, 6.6)
-    axes.set_ylim(-2.4, 1.1)
-    save_figure(figure, "training_pipeline")
+    ).render(context)
 
 
 @dataclass(frozen=True)
@@ -583,11 +545,13 @@ PUBLISHED_MODELS = [
 ]
 
 
-def figure_training_compute() -> None:
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
+@FIGURES.register("training_compute")
+def render_training_compute(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
     years = [model.year for model in PUBLISHED_MODELS]
     compute = [model.training_compute() for model in PUBLISHED_MODELS]
-    axes.scatter(years, compute, s=120, color=BLUE, zorder=3)
+    axes.scatter(years, compute, s=120, color=palette.blue, zorder=3)
     offsets = {"PaLM": (-0.1, 2.2), "Chinchilla": (0.1, 0.35)}
     for model, value in zip(PUBLISHED_MODELS, compute):
         dx, factor = offsets.get(model.name, (0.12, 1.6))
@@ -599,16 +563,18 @@ def figure_training_compute() -> None:
     axes.set_xlabel("godina")
     axes.set_ylabel("računanje $6ND$ (FLOP)")
     axes.set_title("GPT-3 → Llama 3.1: ~100× više računanja za 4 godine")
-    save_figure(figure, "training_compute")
+    return figure
 
 
-def figure_compression() -> None:
+@FIGURES.register("compression")
+def render_compression(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     items = [
-        ("tekst za trening\n15.6T tokena", 60e12, MUTED_INK),
-        ("model\n405B parametara", 0.81e12, BLUE),
-        ("Vikipedija\n(engleska, ≈ tekst)", 0.02e12, AQUA),
+        ("tekst za trening\n15.6T tokena", 60e12, palette.muted_ink),
+        ("model\n405B parametara", 0.81e12, palette.blue),
+        ("Vikipedija\n(engleska, ≈ tekst)", 0.02e12, palette.aqua),
     ]
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
     labels = [label for label, _, _ in items]
     sizes = [size / 1e9 for _, size, _ in items]
     axes.bar(labels, sizes, color=[c for _, _, c in items], width=0.55)
@@ -620,295 +586,197 @@ def figure_compression() -> None:
     axes.set_ylabel("veličina (GB)")
     axes.set_title("model je ~75× manji od teksta iz kojeg je učio")
     axes.grid(axis="x", visible=False)
-    save_figure(figure, "compression")
+    return figure
 
 
-def figure_dpi_chain() -> None:
-    figure, axes = create_blank_canvas((12, 4.6))
-    steps = [("Svet", GREEN, 3.0), ("Ljudi", BLUE, 2.2),
-             ("Tekst", VIOLET, 1.5), ("Model", ORANGE, 0.9)]
-    spacing = 3.4
-    offset = spacing * (len(steps) - 1) / 2
-    for index, (label, color, height) in enumerate(steps):
-        x = index * spacing - offset
-        axes.add_patch(FancyBboxPatch((x - 1.0, -height / 2), 2.0, height,
-                                      boxstyle="round,pad=0.05",
-                                      facecolor=color, edgecolor="none"))
-        axes.text(x, 0, label, ha="center", va="center", color="white",
-                  fontsize=18, fontweight="bold")
-        if index < len(steps) - 1:
-            draw_arrow(axes, (x + 1.1, 0), (x + spacing - 1.1, 0))
-        else:
-            continue
-    captions = ["opažanje", "zapisivanje", "kompresija"]
-    for index, caption in enumerate(captions):
-        x = index * spacing - offset + spacing / 2
-        axes.text(x, 0.35, caption, ha="center", fontsize=13,
-                  color=MUTED_INK)
-    axes.text(0, -2.1, "visina = koliko informacije o svetu ostaje",
-              ha="center", fontsize=14, color=MUTED_INK)
-    axes.set_xlim(-6.6, 6.6)
-    axes.set_ylim(-2.5, 1.9)
-    save_figure(figure, "dpi_chain")
+@FIGURES.register("dpi_chain")
+def render_dpi_chain(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return FunnelDiagram(
+        steps=[
+            DiagramNode("Svet", palette.green),
+            DiagramNode("Ljudi", palette.blue),
+            DiagramNode("Tekst", palette.violet),
+            DiagramNode("Model", palette.orange),
+        ],
+        edge_captions=["opažanje", "zapisivanje", "kompresija"],
+        note="visina = koliko informacije o svetu ostaje",
+    ).render(context)
 
 
-def figure_agent_loop() -> None:
-    figure, axes = create_blank_canvas((10, 5.6))
-    draw_box(axes, (-3, 0), "LLM\n(mozak)", BLUE, 2.6, 1.4)
-    draw_box(axes, (3, 1.6), "alati\nkod · pretraga · Lean", VIOLET, 3.4, 1.3)
-    draw_box(axes, (3, -1.6), "okruženje\nrezultat · greška", AQUA, 3.4, 1.3)
-    draw_box(axes, (-3, 2.9), "cilj", ORANGE, 1.8, 0.8)
-    draw_arrow(axes, (-3, 2.45), (-3, 0.75))
-    draw_arrow(axes, (-1.65, 0.5), (1.25, 1.5), curve=-0.2)
-    draw_arrow(axes, (3, 0.9), (3, -0.9))
-    draw_arrow(axes, (1.25, -1.5), (-1.65, -0.5), curve=-0.2)
-    axes.text(-0.4, 1.75, "akcija", fontsize=15, ha="center", color=INK)
-    axes.text(-0.4, -1.85, "opažanje", fontsize=15, ha="center", color=INK)
-    axes.text(0, -3.3, "povratna sprega: probaj → vidi → ispravi",
-              ha="center", fontsize=16, color=MUTED_INK)
-    axes.set_xlim(-5, 5.2)
-    axes.set_ylim(-3.7, 3.5)
-    save_figure(figure, "agent_loop")
+@FIGURES.register("agent_loop")
+def render_agent_loop(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return FeedbackLoopDiagram(
+        controller=DiagramNode("LLM\n(mozak)", palette.blue),
+        upper=DiagramNode("alati\nkod · pretraga · Lean", palette.violet),
+        lower=DiagramNode("okruženje\nrezultat · greška", palette.aqua),
+        goal=DiagramNode("cilj", palette.orange),
+        edge_labels=("akcija", "opažanje"),
+        note="povratna sprega: probaj → vidi → ispravi",
+    ).render(context)
 
 
-def figure_error_compounding() -> None:
+@FIGURES.register("error_compounding")
+def render_error_compounding(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     steps = np.arange(0, 101)
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
-    for probability, color in [(0.9, RED), (0.99, ORANGE)]:
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
+    for probability, color in [(0.9, palette.red), (0.99, palette.orange)]:
         axes.plot(steps, probability ** steps, color=color,
                   label=f"$p = {probability}$ po koraku")
     retries = 3
     verified = (1 - (1 - 0.9) ** retries) ** steps
-    axes.plot(steps, verified, color=GREEN, lw=3, ls="--",
+    axes.plot(steps, verified, color=palette.green, lw=3, ls="--",
               label="$p = 0.9$ + provera, 3 pokušaja $\\Rightarrow 0.999$")
     axes.set_xlabel("broj koraka $n$")
     axes.set_ylabel("P(sve tačno) $= p^n$")
     axes.set_ylim(0, 1.02)
     axes.legend(loc="lower right", bbox_to_anchor=(1, 0.06))
-    save_figure(figure, "error_compounding")
+    return figure
 
 
-def figure_navier_stokes_terms() -> None:
-    figure, axes = create_blank_canvas((12, 3.4))
-    terms = [
-        (-5.0, "$\\frac{\\partial u}{\\partial t}$", "promena\nbrzine", BLUE),
-        (-3.2, "$+$", "", INK),
-        (-1.9, "$(u \\cdot \\nabla) u$", "tok nosi\nsam sebe", VIOLET),
-        (-0.4, "$=$", "", INK),
-        (0.8, "$-\\nabla p$", "pritisak", AQUA),
-        (2.0, "$+$", "", INK),
-        (3.1, "$\\nu \\Delta u$", "trenje\n(viskoznost)", ORANGE),
-        (4.2, "$+$", "", INK),
-        (5.1, "$f$", "spoljna\nsila", RED),
-    ]
-    for x, formula, caption, color in terms:
-        axes.text(x, 0.4, formula, ha="center", va="center", fontsize=34,
-                  color=color)
-        if caption:
-            axes.text(x, -1.0, caption, ha="center", va="top", fontsize=14,
-                      color=color)
-        else:
-            continue
-    axes.set_xlim(-6, 6)
-    axes.set_ylim(-2.2, 1.4)
-    save_figure(figure, "navier_stokes_terms")
+@FIGURES.register("navier_stokes_terms")
+def render_navier_stokes_terms(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return EquationTermsDiagram(
+        terms=[
+            DiagramNode("$\\frac{\\partial u}{\\partial t}$",
+                        palette.blue, "promena\nbrzine"),
+            DiagramNode("$+$", palette.ink),
+            DiagramNode("$(u \\cdot \\nabla) u$", palette.violet,
+                        "tok nosi\nsam sebe"),
+            DiagramNode("$=$", palette.ink),
+            DiagramNode("$-\\nabla p$", palette.aqua, "pritisak"),
+            DiagramNode("$+$", palette.ink),
+            DiagramNode("$\\nu \\Delta u$", palette.orange,
+                        "trenje\n(viskoznost)"),
+            DiagramNode("$+$", palette.ink),
+            DiagramNode("$f$", palette.red, "spoljna\nsila"),
+        ]
+    ).render(context)
 
 
-def figure_blowup() -> None:
+@FIGURES.register("blowup")
+def render_blowup(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     time = np.linspace(0, 0.995, 400)
     blowup_time = 1.0
-    figure, axes = plt.subplots(figsize=FIGURE_SIZE_WIDE)
+    figure, axes = context.create_figure(DEFAULT_WIDE_SIZE)
     smooth = 1 + 0.6 * np.sin(4 * time) * np.exp(-time)
-    axes.plot(time * 1.2, smooth, color=BLUE,
+    axes.plot(time * 1.2, smooth, color=palette.blue,
               label="glatko rešenje: ostaje konačno")
     exploding = 1 / (blowup_time - time) ** 0.5
-    axes.plot(time, exploding, color=RED,
+    axes.plot(time, exploding, color=palette.red,
               label="eksplozija: $|u| \\to \\infty$")
-    axes.axvline(blowup_time, color=RED, ls="--")
-    axes.text(blowup_time + 0.01, 9, "$T^*$", fontsize=20, color=RED)
+    axes.axvline(blowup_time, color=palette.red, ls="--")
+    axes.text(blowup_time + 0.01, 9, "$T^*$", fontsize=20, color=palette.red)
     axes.set_ylim(0, 12)
     axes.set_xlim(0, 1.2)
     axes.set_xlabel("vreme $t$")
     axes.set_ylabel("najveća brzina $\\max|u|$")
     axes.legend(loc="upper left")
-    save_figure(figure, "blowup")
+    return figure
 
 
-def figure_lean_feedback() -> None:
-    figure, axes = create_blank_canvas((11, 5))
-    draw_box(axes, (-3.8, 0), "AI agenti\npredlažu dokaz", BLUE, 3.0, 1.4)
-    draw_box(axes, (0.6, 0), "Lean jezgro\nproverava svaki korak", MUTED_INK,
-             3.4, 1.4)
-    draw_box(axes, (4.4, 1.3), "✓ dokazano", GREEN, 2.4, 0.9)
-    draw_box(axes, (4.4, -1.3), "✗ greška u koraku", RED, 2.8, 0.9)
-    draw_arrow(axes, (-2.25, 0), (-1.15, 0))
-    draw_arrow(axes, (2.35, 0.3), (3.15, 1.1))
-    draw_arrow(axes, (2.35, -0.3), (3.0, -1.1))
-    draw_arrow(axes, (3.0, -1.75), (-3.8, -0.75), color=RED, curve=-0.35)
-    axes.text(-0.6, -2.9, "poruka o grešci nazad agentu", ha="center",
-              fontsize=14, color=RED)
-    axes.set_xlim(-5.5, 6)
-    axes.set_ylim(-3.4, 2.2)
-    save_figure(figure, "lean_feedback")
+@FIGURES.register("lean_feedback")
+def render_lean_feedback(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return VerificationLoopDiagram(
+        producer=DiagramNode("AI agenti\npredlažu dokaz", palette.blue),
+        checker=DiagramNode("Lean jezgro\nproverava svaki korak",
+                            palette.muted_ink),
+        accepted=DiagramNode("✓ dokazano", palette.green),
+        rejected=DiagramNode("✗ greška u koraku", palette.red),
+        note="poruka o grešci nazad agentu",
+    ).render(context)
 
 
-def figure_navier_stokes_timeline() -> None:
+@FIGURES.register("navier_stokes_timeline")
+def render_navier_stokes_timeline(context: FigureContext) -> plt.Figure:
+    palette = context.palette
     events = [
         (0, "15. avg", "Buckmaster i Alpöge:\neksplozija forsiranog Ojlera",
-         AQUA),
-        (7, "22. avg", "njihov dokaz\nproveren u Lean-u", VIOLET),
-        (17, "1. sep", "OpenAI počinje:\n~10.000 agenata", BLUE),
-        (21, "+88 h", "rezultat, pa\n+17 h Lean", ORANGE),
-        (24, "8. sep", "objava: forsirani\nNavier–Stokes", RED),
+         palette.aqua),
+        (7, "22. avg", "njihov dokaz\nproveren u Lean-u", palette.violet),
+        (17, "1. sep", "OpenAI počinje:\n~10.000 agenata", palette.blue),
+        (21, "+88 h", "rezultat, pa\n+17 h Lean", palette.orange),
+        (24, "8. sep", "objava: forsirani\nNavier–Stokes", palette.red),
     ]
-    figure, axes = create_blank_canvas((12, 3.6))
-    axes.plot([-2, 26], [0, 0], color=INK, lw=2)
-    for index, (day, date, label, color) in enumerate(events):
-        side = 1 if index % 2 == 0 else -1
-        axes.scatter(day, 0, s=180, color=color, zorder=3)
-        axes.plot([day, day], [0, 0.5 * side], color=color)
-        axes.text(day, 0.62 * side, label, ha="center",
-                  va="bottom" if side > 0 else "top", fontsize=13)
-        axes.text(day, -0.28 * side, date, ha="center",
-                  va="top" if side > 0 else "bottom", fontsize=13,
-                  color=MUTED_INK)
-    axes.set_xlim(-4, 28)
-    axes.set_ylim(-2, 2)
-    save_figure(figure, "navier_stokes_timeline")
+    return TimelineDiagram(
+        events=[
+            TimelineEvent(
+                label=label, caption=caption, color=color, position=day
+            )
+            for day, caption, label, color in events
+        ],
+        spacing=3.0,
+    ).render(context)
 
 
-def figure_turing_test() -> None:
-    figure, axes = create_blank_canvas((10, 5))
-    draw_box(axes, (-3.5, 0), "sudija", ORANGE, 2.2, 1.0)
-    draw_box(axes, (3.2, 1.5), "čovek", GREEN, 2.2, 1.0)
-    draw_box(axes, (3.2, -1.5), "mašina", BLUE, 2.2, 1.0)
-    axes.plot([0.6, 0.6], [-2.6, 2.6], color=MUTED_INK, lw=6)
-    axes.text(0.6, 2.9, "zid", ha="center", fontsize=14, color=MUTED_INK)
-    draw_arrow(axes, (-2.3, 0.3), (2.0, 1.4), curve=-0.1)
-    draw_arrow(axes, (-2.3, -0.3), (2.0, -1.4), curve=0.1)
+@FIGURES.register("turing_test")
+def render_turing_test(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    canvas = context.blank_canvas((10, 5))
+    axes = canvas.axes
+    canvas.draw_box((-3.5, 0), "sudija", palette.orange, BoxSize(2.2, 1.0))
+    canvas.draw_box((3.2, 1.5), "čovek", palette.green, BoxSize(2.2, 1.0))
+    canvas.draw_box((3.2, -1.5), "mašina", palette.blue, BoxSize(2.2, 1.0))
+    axes.plot([0.6, 0.6], [-2.6, 2.6], color=palette.muted_ink, lw=6)
+    axes.text(
+        0.6,
+        2.9,
+        "zid",
+        ha="center",
+        fontsize=14,
+        color=palette.muted_ink,
+    )
+    canvas.draw_arrow((-2.3, 0.3), (2.0, 1.4), curve=-0.1)
+    canvas.draw_arrow((-2.3, -0.3), (2.0, -1.4), curve=0.1)
     axes.text(-0.4, 1.4, "pitanja", fontsize=14, ha="center")
     axes.text(-3.5, -1.3, "Ko je ko?", fontsize=18, ha="center",
-              color=INK)
+              color=palette.ink)
     axes.set_xlim(-5, 4.8)
     axes.set_ylim(-3, 3.3)
-    save_figure(figure, "turing_test")
+    return canvas.figure
 
 
-def figure_formal_system() -> None:
-    figure, axes = create_blank_canvas((11, 5))
-    draw_box(axes, (-4.2, 1.5), "aksiome", BLUE, 2.2, 0.9)
-    draw_box(axes, (-4.2, 0), "pravila", VIOLET, 2.2, 0.9)
-    draw_box(axes, (-4.2, -1.5), "simboli", AQUA, 2.2, 0.9)
-    draw_arrow(axes, (-3.0, 1.2), (-0.6, 0.3))
-    draw_arrow(axes, (-3.0, 0), (-0.6, 0))
-    draw_arrow(axes, (-3.0, -1.2), (-0.6, -0.3))
-    axes.add_patch(Circle((2.6, 0), 2.6, facecolor="#fde7dd",
-                          edgecolor=ORANGE, lw=2))
-    axes.add_patch(Circle((2.0, 0), 1.6, facecolor="#dbe8f8",
-                          edgecolor=BLUE, lw=2))
-    axes.text(2.0, 0, "dokazive\nteoreme", ha="center", va="center",
-              fontsize=15, color=INK)
-    axes.text(4.35, 0.15, "istinite,\nali\nnedokazive", ha="center",
-              va="center", fontsize=12, color=ORANGE)
-    axes.text(2.6, 2.85, "sve istinite tvrdnje", ha="center", fontsize=14,
-              color=ORANGE)
-    axes.text(-4.2, -2.7, "Gedel (1931)", ha="center", fontsize=15,
-              color=MUTED_INK)
-    axes.set_xlim(-5.6, 5.6)
-    axes.set_ylim(-3.0, 3.3)
-    axes.set_aspect("equal")
-    save_figure(figure, "formal_system")
-
-
-def figure_summary_chain() -> None:
-    figure, axes = create_blank_canvas((13, 2.8))
-    draw_chain(
-        axes,
-        [
-            ("model", MUTED_INK),
-            ("mašinsko\nučenje", AQUA),
-            ("jezički\nmodel", BLUE),
-            ("LLM", VIOLET),
-            ("agent +\nverifikator", ORANGE),
+@FIGURES.register("formal_system")
+def render_formal_system(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return NestedSetsDiagram(
+        outer_label="sve istinite tvrdnje",
+        inner_label="dokazive\nteoreme",
+        gap_label="istinite,\nali\nnedokazive",
+        inputs=[
+            DiagramNode("aksiome", palette.blue),
+            DiagramNode("pravila", palette.violet),
+            DiagramNode("simboli", palette.aqua),
         ],
+        note="Gedel (1931)",
+    ).render(context)
+
+
+@FIGURES.register("summary_chain")
+def render_summary_chain(context: FigureContext) -> plt.Figure:
+    palette = context.palette
+    return FlowDiagram(
+        steps=[
+            DiagramNode("model", palette.muted_ink),
+            DiagramNode("mašinsko\nučenje", palette.aqua),
+            DiagramNode("jezički\nmodel", palette.blue),
+            DiagramNode("LLM", palette.violet),
+            DiagramNode("agent +\nverifikator", palette.orange),
+        ],
+        box_size=BoxSize(2.2, 1.2),
         spacing=2.8,
-        width=2.2,
-        height=1.2,
-    )
-    axes.set_xlim(-6.8, 6.8)
-    axes.set_ylim(-1, 1)
-    save_figure(figure, "summary_chain")
-
-
-@dataclass(frozen=True)
-class FigureSpecification:
-    name: str
-    render: Callable[[], None]
-
-
-FIGURE_REGISTRY = [
-    FigureSpecification("model_map", figure_model_map),
-    FigureSpecification("model_spectrum", figure_model_spectrum),
-    FigureSpecification("programming_vs_learning",
-                        figure_programming_vs_learning),
-    FigureSpecification("fitting_loss", figure_fitting_loss),
-    FigureSpecification("neural_network", figure_neural_network),
-    FigureSpecification("next_token", figure_next_token),
-    FigureSpecification("language_model_timeline",
-                        figure_language_model_timeline),
-    FigureSpecification("scaling_law", figure_scaling_law),
-    FigureSpecification("attention_heatmap", figure_attention_heatmap),
-    FigureSpecification("transformer_block", figure_transformer_block),
-    FigureSpecification("alphafold_pipeline", figure_alphafold_pipeline),
-    FigureSpecification("contact_map", figure_contact_map),
-    FigureSpecification("universal_approximation",
-                        figure_universal_approximation),
-    FigureSpecification("generalization", figure_generalization),
-    FigureSpecification("bias_variance_fits", figure_bias_variance_fits),
-    FigureSpecification("bias_variance_curve", figure_bias_variance_curve),
-    FigureSpecification("training_pipeline", figure_training_pipeline),
-    FigureSpecification("training_compute", figure_training_compute),
-    FigureSpecification("compression", figure_compression),
-    FigureSpecification("dpi_chain", figure_dpi_chain),
-    FigureSpecification("agent_loop", figure_agent_loop),
-    FigureSpecification("error_compounding", figure_error_compounding),
-    FigureSpecification("navier_stokes_terms", figure_navier_stokes_terms),
-    FigureSpecification("blowup", figure_blowup),
-    FigureSpecification("lean_feedback", figure_lean_feedback),
-    FigureSpecification("navier_stokes_timeline",
-                        figure_navier_stokes_timeline),
-    FigureSpecification("turing_test", figure_turing_test),
-    FigureSpecification("formal_system", figure_formal_system),
-    FigureSpecification("summary_chain", figure_summary_chain),
-]
-
-
-def select_figures() -> list[FigureSpecification]:
-    wanted = {name for name in SELECTED_FIGURES.split(",") if name}
-    if wanted:
-        return [spec for spec in FIGURE_REGISTRY if spec.name in wanted]
-    else:
-        return list(FIGURE_REGISTRY)
-
-
-def render_all_figures() -> int:
-    failures = 0
-    for specification in select_figures():
-        try:
-            specification.render()
-        except Exception:
-            log.exception("figure %s failed", specification.name)
-            failures += 1
-    return failures
+    ).render(context)
 
 
 def main() -> int:
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
-    OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
-    configure_style()
-    failures = render_all_figures()
-    log.info("done, %d failures", failures)
-    return 1 if failures else 0
+    return render_registry(
+        FIGURES, DEFAULT_OUTPUT_DIRECTORY, default_seed=DEFAULT_SEED
+    )
 
 
 if __name__ == "__main__":
