@@ -109,15 +109,15 @@ Zajedno: **bilo koja** funkcija.
 ![w:950 center](img/next_token.svg)
 
 ## P( sledeća reč | sve prethodne reči )
-
+<!-- 
 ---
 
 # Kratka istorija
 
 ![w:1200 center](img/language_model_timeline.svg)
 
-Ista ideja od **1948.** — samo sve više podataka i računanja.
-
+Ista ideja od **1948.** — samo sve više podataka i računanja. -->
+<!-- 
 ---
 
 # Šta je „veliko” u LLM?
@@ -126,7 +126,7 @@ Ista ideja od **1948.** — samo sve više podataka i računanja.
 
 $$
 C \approx 6 \cdot N \cdot D \qquad N = \text{parametri},\ D = \text{tokeni}
-$$
+$$ -->
 
 ---
 
@@ -137,14 +137,14 @@ $$
 „Mačka nije pojela ribu jer **je** bila **sita**.”
 
 Ko je sit? Reč **je** gleda na **Mačka**.
-
+<!-- 
 $$
 \text{izlaz} = \sum_j w_j \cdot v_j
 $$
 
 $$
 \sum_j w_j = 1
-$$
+$$ -->
 
 ---
 
@@ -163,23 +163,11 @@ Ista arhitektura za tekst, slike, zvuk… i **proteine**.
 
 ---
 
-# AlphaFold
+# Kako se trenira LLM
 
-![w:1150 center](img/alphafold_pipeline.svg)
+![w:1150 center](img/training_pipeline.svg)
 
-<br>
-
-Isti Transformer — umesto reči, **aminokiseline**.
-
-Nobelova nagrada za hemiju **2024**: Hasabis i Džamper
-
----
-
-# AlphaFold: od niza do oblika
-
-![w:1050 center](img/contact_map.svg)
-
-Pažnja pogađa **koji parovi se dodiruju** · baza sa 200+ miliona struktura
+Pred-trening troši **najveći deo** računanja. Ostalo je „vaspitanje”.
 
 ---
 
@@ -215,14 +203,27 @@ Plave linije: isti model, **20 različitih** skupova podataka.
 
 ## greška = pristrasnost² + varijansa + šum
 
+
+---
+# AlphaFold
+
+![w:1150 center](img/alphafold_pipeline.svg)
+
+<br>
+
+Isti Transformer — umesto reči, **aminokiseline**.
+
+Nobelova nagrada za hemiju **2024**: Hasabis i Džamper
+
 ---
 
-# Kako se trenira LLM
+# AlphaFold
 
-![w:1150 center](img/training_pipeline.svg)
+![w:1050 center](img/contact_map.svg)
 
-Pred-trening troši **najveći deo** računanja. Ostalo je „vaspitanje”.
+Pažnja pogađa **koji parovi se dodiruju** · baza sa 200+ miliona struktura
 
+<!-- 
 ---
 
 # Cena računanja
@@ -245,7 +246,7 @@ $$
 
 <br>
 
-GPT-4 (2023): **više od 100 miliona $** · pravilo: ~**20 tokena** po parametru
+GPT-4 (2023): **više od 100 miliona $** · pravilo: ~**20 tokena** po parametru -->
 
 ---
 
@@ -280,7 +281,7 @@ Nijedna obrada ne **stvara** informaciju o svetu.
 
 <br>
 
-Zato su modeli najjači tamo gde postoji **provera**.
+Zato su modeli najkorisniji tamo gde postoji **provera**.
 
 ---
 
@@ -343,7 +344,7 @@ theorem dva_plus_dva : 2 + 2 = 4 := by
 - **kontraprimer**: glatka sila $f$ + glatki početak ⇒ brzina $\to \infty$ u konačnom vremenu
 - za $\mathbb{R}^3$ i torus · dokaz formalizovan u **Lean 4**
 - ~10.000 agenata · 88 h + 17 h za Lean · nagradu **ne traži**
-
+<!-- 
 ---
 
 # Oprez
@@ -356,7 +357,7 @@ theorem dva_plus_dva : 2 + 2 = 4 := by
 | Lean proverava da je **iskaz** dobro zapisan | ✗ — to moraju ljudi |
 | recenzija i Clay institut | još nije |
 
-Spor oko prioriteta: Buckmaster (NYU) i Alpöge (Anthropic), forsirana Ojlerova jednačina.
+Spor oko prioriteta: Buckmaster (NYU) i Alpöge (Anthropic), forsirana Ojlerova jednačina. -->
 
 ---
 
@@ -371,7 +372,7 @@ Ako sudija **ne razlikuje** mašinu od čoveka ⇒ mašina „misli”?
 Današnji LLM-ovi ga **ne prolaze**.
 
 Test meri **ponašanje**, ne razumevanje.
-
+<!-- 
 ---
 
 # Zašto AI nije inteligencija
@@ -384,7 +385,7 @@ Test meri **ponašanje**, ne razumevanje.
 | razumevanje | značenje | statistika simbola |
 | dokaz Navier–Stokes | **postavio** problem | pretražio dokaze |
 
-Protivargument: možda je i mozak formalni sistem — **otvoreno pitanje**.
+Protivargument: možda je i mozak formalni sistem — **otvoreno pitanje**. -->
 
 ---
 
