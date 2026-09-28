@@ -9,7 +9,7 @@ Formati koji se grade:
 | Format | Kako se gradi |
 |---|---|
 | Marp markdown | podrazumevano, `marp` |
-| LaTeX (`fp`, `git-predavanje`, `projekat`, `projekat-letnji`, `tla_plus`) | `build.sh` u tom direktorijumu, `latexmk` |
+| LaTeX (`fp`, `git-predavanje`, `projekat`, `projekat-letnji`, `tla_plus`) | `build.sh` koji učitava `tools/latex_build.sh` |
 | LibreOffice (`hpc`) | `build.sh` u tom direktorijumu, `soffice` |
 
 ## Gradnja
